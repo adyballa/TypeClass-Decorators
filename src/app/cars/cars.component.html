@@ -1,0 +1,21 @@
+<div>
+    <h3>Sortierung</h3>
+    <label for="color">Color</label><input (change)="cardinalityChanged($event)" type="radio" name="first_cardinality" id="color" value="color" checked />
+    <label for="engine">Engine</label><input (change)="cardinalityChanged($event)" type="radio" name="first_cardinality" id="engine" value="engine" />
+    <h3>all cars sorted</h3>
+    <ul *ngFor="let car of sorted">
+        <li>Das Auto von {{car.brand}} ist {{car.color}} mit {{car.engine}} PS.</li>
+    </ul>
+    <h3>all cars found</h3>
+    <ul *ngFor="let car of eq">
+        <li>Das Auto von {{car.brand}} ist {{car.color}} mit {{car.engine}} PS.</li>
+    </ul>
+    <h3>all cars in</h3>
+    <ul *ngFor="let car of inRange">
+        <li>Das Auto von {{car.brand}} ist {{car.color}} mit {{car.engine}} PS.</li>
+    </ul>
+    <h3>all cars less</h3>
+    <ul *ngFor="let car of less">
+        <li>Das Auto von {{car.brand}} ist {{car.color}} mit {{car.engine}} PS.</li>
+    </ul>
+</div>
