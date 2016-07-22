@@ -1,0 +1,33 @@
+span.cell{
+  display: inline-block;
+  min-width: 100px;
+  border: 2px solid #202050;
+  background: #c8def4;
+  padding: 4px 8px;
+  border-right-width: 0;
+  border-top-width: 0;
+}
+
+span.cell:last-child{
+  border-right-width: 2px;
+}
+
+span.cell-color-red{
+  background: #cd0a0a;
+}
+
+span.cell-color-yellow{
+  background: #fbd850;
+}
+
+span.cell-color-blue{
+  background: #528CE0;
+}
+
+ul.result-list li:first-child span.cell{
+  border-top-width: 2px;
+}
+
+ul.result-list{
+  list-style: none;
+}

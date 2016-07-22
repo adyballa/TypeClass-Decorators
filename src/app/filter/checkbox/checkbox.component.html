@@ -1,0 +1,4 @@
+<label>{{ field.name }}:</label>
+<span *ngFor="let val of options">
+    {{ val }}<input #inps type="checkbox" name="filter-checkbox-{{ field.name }}" value="{{ val }}" (change)="update($event)" />
+</span>

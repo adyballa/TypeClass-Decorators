@@ -6,13 +6,13 @@ import {
   expect, it, xit,
   async, inject
 } from '@angular/core/testing';
-import { CarsService } from './cars.service';
+import { ListModelService } from './listModel.service';
 
 describe('Cars Service', () => {
-  beforeEachProviders(() => [CarsService]);
+  beforeEachProviders(() => [ListModelService]);
 
   it('should ...',
-      inject([CarsService], (service: CarsService) => {
+      inject([ListModelService], (service: ListModelService) => {
     expect(service).toBeTruthy();
   }));
 });

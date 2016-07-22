@@ -2,7 +2,8 @@
 
 import { By }           from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
-import { ListModelService } from './listModel.service';
+import { ListModelService } from "../../cars/listModel.service";
+
 import {
   beforeEach, beforeEachProviders,
   describe, xdescribe,
@@ -10,11 +11,11 @@ import {
   async, inject
 } from '@angular/core/testing';
 
-import { CarsComponent } from './cars.component';
+import { SortComponent } from './sort.component';
 
-describe('Component: Cars', () => {
+describe('Component: Sort', () => {
   it('should create an instance', () => {
-    let component = new CarsComponent(new ListModelService());
+    let component = new SortComponent(new ListModelService);
     expect(component).toBeTruthy();
   });
 });

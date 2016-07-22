@@ -17,7 +17,7 @@ export class Field extends EqField {
 
     public map:Array<string>;
 
-    constructor(name:string, props:IFieldProperty) {
+    constructor(public name:string, props:IFieldProperty) {
         super(name);
         this.map = ('map' in props) ? props.map : [];
     }
@@ -32,7 +32,11 @@ export class Field extends EqField {
         return (vals[0] === null || vals[1] === null || vals[0] === vals[1]) ? null : (vals[0] < vals[1]);
     }
 
-    protected value(object:IOrd):number|string {
+    public value(object:IOrd):number|string {
+        let val = object[this.name];
+        if (val === null) {
+            return null;
+        }
         if (this.map.length) {
             return this.map.indexOf(object[this.name]);
         } else {
@@ -41,8 +45,12 @@ export class Field extends EqField {
     }
 }
 
-function isOrd(object:any):object is IOrd {
+export function isOrd(object:any):object is IOrd {
     return ('greater' in object && 'less' in object);
+}
+
+export function isFieldOrd(object:any):object is Field {
+    return ('name' in object && 'map' in object);
 }
 
 const
@@ -69,14 +77,8 @@ export class Ord extends Eq {
 
     private static _ord:{fields:Array<Field>} = {fields: []};
 
-    static type(target:Function) {
+    static implementFields(target:Function) {
         let _f = [];
-        if (!("greater" in target.prototype)) {
-            implGreater(target);
-        }
-        if (!("less" in target.prototype)) {
-            implLess(target);
-        }
         for (let i = 0, j = Ord._ord.fields.length; i < j; i++) {
             if (Ord._ord.fields[i] !== undefined) {
                 _f.push(Ord._ord.fields[i]);
@@ -87,7 +89,7 @@ export class Ord extends Eq {
             Object.defineProperty(target.prototype, '_ord', {
                 value: {fields: _f}
             });
-        }else{
+        } else {
             target.prototype._ord.fields = target.prototype._ord.fields.concat(_f);
         }
 
@@ -95,12 +97,18 @@ export class Ord extends Eq {
             Object.defineProperty(target.prototype, '_eq', {
                 value: {fields: _f}
             });
-        }else{
+        } else {
             target.prototype._eq.fields = target.prototype._eq.fields.concat(_f);
         }
 
         Ord._ord.fields = [];
-        super.type(target);
+    }
+
+    static implement(target:Function) {
+        Ord.implementFields(target);
+        implGreater(target);
+        implLess(target);
+        super.implement(target);
     }
 
     static field(props:IFieldProperty) {
@@ -116,40 +124,62 @@ export class Ord extends Eq {
         });
     }
 
-    static greater(cs:IOrd[], ref:Object):IOrd[] {
-        if (isOrd(ref)) {
-            return cs.filter((a:IOrd) => {
-                return (a.greater(ref));
-            });
-        }
-        return [];
-    }
-
-    static less(cs:IOrd[], ref:Object):IOrd[] {
-        if (isOrd(ref)) {
-            return cs.filter((a:IOrd) => {
-                return (!a.greater(ref) && !a.eq(ref));
-            });
-        }
-        return [];
-    }
-
-    static inRange(cs:IOrd[], top:Object, bottom:Object):IOrd[] {
-        if (isOrd(top) && isOrd(bottom)) {
-            return cs.filter((a:IOrd) => {
-                return (a.greater(bottom) && (!a.greater(top) && !a.eq(top)));
-            });
-        }
-        return [];
-    }
-
-    static swapCardinality(cs:IOrd[], name:string, newIndex = 0) {
-        cs.map((car:IOrd) => {
-            let oldKey = car._ord.fields.findIndex((val:EqField) => {
-                return (val.name === name);
-            }), old = car._ord.fields[newIndex];
-            car._ord.fields[newIndex] = car._ord.fields[oldKey];
-            car._ord.fields[oldKey] = old;
+    static greater(cs:IOrd[], ref:IOrd):IOrd[] {
+        return cs.filter((a:IOrd) => {
+            return (ref.less(a));
         });
+    }
+
+    static less(cs:IOrd[], ref:IOrd):IOrd[] {
+        return cs.filter((a:IOrd) => {
+            return (ref.greater(a));
+        });
+    }
+
+    static inRange(cs:IOrd[], top:IOrd, bottom:IOrd):IOrd[] {
+        return cs.filter((a:IOrd) => {
+            return (top.greater(a) !== false && bottom.less(a) !== false);
+        });
+    }
+
+    static setCardinality(cs:IOrd[], name:string, newIndex = 0) {
+        cs.map((item:IOrd) => {
+            let oldKey = item._ord.fields.findIndex((val:EqField) => {
+                return (val.name === name);
+            }), old = item._ord.fields[newIndex];
+            item._ord.fields.splice(newIndex, 0, item._ord.fields.splice(oldKey, 1)[0]);
+        });
+    }
+}
+
+const
+    _implAnd = function (method:string) {
+        return function (a:IOrd) {
+            let res = null;
+            for (let i = 0, j = a._ord.fields.length; i < j; i++) {
+                let val = (a._ord.fields[i][method](this, a));
+                if (val !== null) {
+                    if (!val) return false;
+                    res = true;
+                }
+            }
+            return res;
+        }
+    },
+    implGreaterAnd = function (target:Function) {
+        target.prototype.greater = _implAnd('greater');
+    },
+    implLessAnd = function (target:Function) {
+        target.prototype.less = _implAnd('less');
+    }
+    ;
+
+export class OrdAnd extends Ord {
+
+    static implement(target:Function) {
+        implGreaterAnd(target);
+        implLessAnd(target);
+        Ord.implementFields(target);
+        Eq.implement.apply(this, [target]);
     }
 }

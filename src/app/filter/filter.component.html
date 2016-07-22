@@ -1,0 +1,26 @@
+<section class="filterbox">
+    <h3>Filter</h3>
+    <ul class="items">
+        <li *ngFor="let field of fields" [ngSwitch]="createField(field)">
+            <template ngSwitchCase="number">
+                <field-range (filterChange)="filter()" [field]="field" [props]="props"></field-range>
+            </template>
+            <template ngSwitchCase="select">
+                <div [ngSwitch]="field.name">
+                    <template ngSwitchCase="brand">
+                        <field-checkbox (filterChange)="filter()" [field]="field" [props]="props"
+                                        [options]="getOptions(field.name)"></field-checkbox>
+                    </template>
+                    <template ngSwitchDefault>
+                        <field-range-select (filterChange)="filter()" [field]="field"
+                                            [props]="props"></field-range-select>
+                    </template>
+                </div>
+            </template>
+            <template ngSwitchCase="string">
+                <field-checkbox (filterChange)="filter()" [field]="field" [props]="props"
+                                [options]="getOptions(field.name)"></field-checkbox>
+            </template>
+        </li>
+    </ul>
+</section>

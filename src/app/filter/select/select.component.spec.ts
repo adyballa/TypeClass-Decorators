@@ -2,7 +2,7 @@
 
 import { By }           from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
-import { ListModelService } from './listModel.service';
+
 import {
   beforeEach, beforeEachProviders,
   describe, xdescribe,
@@ -10,11 +10,11 @@ import {
   async, inject
 } from '@angular/core/testing';
 
-import { CarsComponent } from './cars.component';
+import { SelectComponent } from './select.component';
 
-describe('Component: Cars', () => {
+describe('Component: Select', () => {
   it('should create an instance', () => {
-    let component = new CarsComponent(new ListModelService());
+    let component = new SelectComponent();
     expect(component).toBeTruthy();
   });
 });

@@ -1,48 +1,70 @@
-import { Component, OnInit } from '@angular/core';
-import { CarsService } from './cars.service';
-import { Ord, Eq } from '../decorators/ord.typeclass';
+import {Component, OnInit} from '@angular/core';
+import {ListModelService} from './listModel.service';
+import {Ord, Eq, IOrd} from '../decorators/ord.typeclass';
+import {FilterComponent} from "../filter/filter.component";
+import {Car} from "../class/car";
+import {SortComponent, TDirection, IDirection} from "../filter/sort/sort.component";
 
 @Component({
-  moduleId: module.id,
-  selector: 'my-cars',
-  templateUrl: 'cars.component.html',
-  styleUrls: ['cars.component.css'],
-  providers: [ CarsService ]
+    moduleId: module.id,
+    selector: 'my-cars',
+    templateUrl: 'cars.component.html',
+    styleUrls: ['cars.component.css'],
+    providers: [ListModelService],
+    directives: [FilterComponent, SortComponent]
 })
-export class CarsComponent implements OnInit{
-  public cars;
+/**
+ * First field is default sort field
+ */
+export class CarsComponent implements OnInit {
 
-  constructor(private carsService : CarsService) {
-  }
+    public model:IOrd;
 
-  ngOnInit():any{
-    this.getCars();
-  }
+    private _result:Car[];
 
-  private getCars(){
-    this.cars = this.carsService.cars;
-  }
+    public dir : IDirection = {
+        state:"ASC"
+    };
 
-  public get sorted(){
-    return Ord.sort(this.cars);
-  }
+    private sortField : SortComponent;
 
-  public get eq(){
-    let props = [null,'red','bmw'];
-    return Eq.eq(this.cars, this.carsService.createCar(props));
-  }
+    constructor(private listService:ListModelService) {
+        this.model = this.listService.getModel();
+    }
 
-  public get inRange(){
-    let bottom = [10,'yellow',null], top = [100, 'red', null];
-    return Ord.inRange(this.cars, this.carsService.createCar(top), this.carsService.createCar(bottom));
-  }
+    ngOnInit():any {
+        this.calculate();
+    }
 
-  public get less(){
-    let top = [50, 'red', 'pontiac'];
-    return Ord.less(this.cars, this.carsService.createCar(top));
-  }
+    public sortFieldChange(sort : SortComponent){
+        if(this.sortField){
+            this.sortField.state = false;
+        }
+        this.sortField = sort;
+        this.sortField.dir = this.dir;
+        this.sortField.setIcon();
+        this.sortField.state = true;
+        this.calculate();
+    }
 
-  public cardinalityChanged(event : Event){
-    Ord.swapCardinality(this.cars, (<HTMLInputElement>event.target).value);
-  }
+    public directionChange(dir : IDirection){
+        this.dir = dir;
+        this.calculate();
+    }
+
+    public calculate(){
+        this._result  = <Car[]> Ord.sort(this.listService.result);
+        if(this.dir.state === "DESC"){
+            this._result.reverse();
+        }
+    }
+
+    public get result() : Car[] {
+        return this._result;
+    }
+
+    public get less() {
+        let top = {engine:50, color:'red', brand:'pontiac', interior:'plastic'};
+        return Ord.less(this.listService.result, this.listService.createItem(top));
+    }
 }

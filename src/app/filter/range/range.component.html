@@ -1,0 +1,6 @@
+<div>
+    {{ field.name }} von: <input type="range" min="1" max="800" name="{{ field.name }}_bottom"
+                                 bindon-ngModel="props.bottom[field.name]" (change)="update()" />
+    {{ field.name }} bis: <input type="range" min="1" max="800" name="{{ field.name }}_top"
+                                 bindon-ngModel="props.top[field.name]" (change)="update()" />
+</div>
