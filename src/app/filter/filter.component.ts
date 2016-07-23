@@ -6,6 +6,8 @@ import {RangeComponent} from "./range/range.component";
 import {SelectRangeComponent} from "./selectRange/selectRange.component";
 import {SelectComponent} from "./select/select.component";
 import {CheckboxComponent} from "./checkbox/checkbox.component";
+import {DateRangeComponent} from "./date-range/date-range.component";
+import {DateComponent} from "./date/date.component";
 
 export interface FilterProperty{
     [name:string] : (string|number|Array<string|number>)
@@ -21,7 +23,7 @@ export interface FilterProperties{
     selector: 'my-filter',
     templateUrl: 'filter.component.html',
     styleUrls: ['filter.component.css'],
-    directives: [ RangeComponent, SelectRangeComponent, SelectComponent, CheckboxComponent ]
+    directives: [ RangeComponent, SelectRangeComponent, SelectComponent, CheckboxComponent, DateRangeComponent, DateComponent ]
 })
 export class FilterComponent {
     @Output()
@@ -57,6 +59,9 @@ export class FilterComponent {
     public createField(field:Field):string {
         if (isFieldOrd(field) && field.map.length > 0) {
             return "select";
+        }
+        if(this._model[field.name] instanceof Date){
+            return (isFieldOrd(field)) ? "date-range" : "date";
         }
         return (!isNaN(Number(this._model[field.name]))) ? "number" : "string";
     }

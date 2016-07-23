@@ -71,7 +71,11 @@ const
     implLess = function (target:Function) {
         target.prototype.less = _impl('less');
     }
-    ;
+;
+
+export interface IOrdConfig {
+    fields : Array<Field>
+}
 
 export class Ord extends Eq {
 
@@ -102,13 +106,16 @@ export class Ord extends Eq {
         }
 
         Ord._ord.fields = [];
+        return _f;
     }
 
-    static implement(target:Function) {
-        Ord.implementFields(target);
-        implGreater(target);
-        implLess(target);
-        super.implement(target);
+    static implement(config : IOrdConfig) {
+        return function(target:Function){
+            config.fields = Ord.implementFields(target);
+            implGreater(target);
+            implLess(target);
+            Eq.implement(config).apply(this, [target]);
+        }
     }
 
     static field(props:IFieldProperty) {
@@ -176,10 +183,12 @@ const
 
 export class OrdAnd extends Ord {
 
-    static implement(target:Function) {
-        implGreaterAnd(target);
-        implLessAnd(target);
-        Ord.implementFields(target);
-        Eq.implement.apply(this, [target]);
+    static implement(config : Object = {}) {
+        return function(target:Function){
+            implGreaterAnd(target);
+            implLessAnd(target);
+            Ord.implementFields(target);
+            Eq.implement(config).apply(this, [target]);
+        }
     }
 }

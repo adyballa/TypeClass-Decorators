@@ -73,10 +73,12 @@ export class Eq {
         Eq._eq.fields = [];
     }
 
-    static implement(target:Function) {
-        Eq.implementFields(target);
-        implEq(target);
-        implNeq(target);
+    static implement(config:Object){
+        return function(target){
+            Eq.implementFields(target);
+            implEq(target);
+            implNeq(target);
+        }
     }
 
     static field(target:Object, propertyKey:string) {

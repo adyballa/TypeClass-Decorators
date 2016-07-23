@@ -41,6 +41,8 @@ const barrels: string[] = [
   'app/filter/text',
   'app/filter/checkbox',
   'app/filter/sort',
+  'app/filter/date',
+  'app/filter/date-range',
   /** @cli-barrel */
 ];
 

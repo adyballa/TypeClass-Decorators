@@ -3,8 +3,16 @@
 </div>
 <div class="content">
     <h3>all cars</h3>
-    <ul class="result-list">
-        <li><span class="cell head" *ngFor="let field of (model._eq.fields); let i = index"><field-sort [cardinality]="i" [field]="field" [ordFields]="model._ord.fields" [dir]="dir" (directionChange)="directionChange($event)" (sortFieldChange)="sortFieldChange($event)"></field-sort></span></li>
-        <li *ngFor="let car of result"><span class="cell cell-{{field.name}}-{{car[field.name]}}" *ngFor="let field of (car._eq.fields)">{{car[field.name]}}</span></li>
-    </ul>
+    <table cellpadding="0" cellspacing="0" class="result-list">
+        <thead>
+            <tr>
+                <td class="cell head" *ngFor="let field of (model._eq.fields); let i = index"><field-sort [cardinality]="i" [field]="field" [ordFields]="model._ord.fields" [dir]="dir" (directionChange)="directionChange($event)" (sortFieldChange)="sortFieldChange($event)"></field-sort></td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let car of result">
+                <td class="cell cell-{{field.name}}-{{car[field.name]}}" *ngFor="let field of (car._eq.fields)">{{car[field.name]}}</td>
+            </tr>
+        </tbody>
+    </table>
 </div>
