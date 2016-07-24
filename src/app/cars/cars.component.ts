@@ -1,9 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {ListModelService} from './listModel.service';
-import {Ord, Eq, IOrd} from '../decorators/ord.typeclass';
+import {Ord, IOrd, IOrdConfig} from '../decorators/ord.typeclass';
 import {FilterComponent} from "../filter/filter.component";
 import {Car} from "../class/car";
-import {SortComponent, TDirection, IDirection} from "../filter/sort/sort.component";
+import {SortComponent, IDirection} from "../filter/sort/sort.component";
 
 @Component({
     moduleId: module.id,
@@ -53,10 +53,14 @@ export class CarsComponent implements OnInit {
     }
 
     public calculate(){
-        this._result  = <Car[]> Ord.sort(this.listService.result);
+        this._result  = <Car[]> Ord.sort(this.listService.result, this.listService.getConfig());
         if(this.dir.state === "DESC"){
             this._result.reverse();
         }
+    }
+
+    public get config() : IOrdConfig {
+        return this.listService.getConfig();
     }
 
     public get result() : Car[] {
@@ -65,6 +69,6 @@ export class CarsComponent implements OnInit {
 
     public get less() {
         let top = {engine:50, color:'red', brand:'pontiac', interior:'plastic'};
-        return Ord.less(this.listService.result, this.listService.createItem(top));
+        return Ord.less(this.listService.result, this.listService.createItem(top), this.listService.getConfig());
     }
 }

@@ -1,4 +1,4 @@
-import {Field as EqField, IEq, isEq, Eq} from "./eq.typeclass";
+import {EqField, IEq, isEq, Eq, IEqConfig, EqConfig, IEqProps, IField} from "./eq.typeclass";
 
 export {EqField, IEq, isEq, Eq};
 
@@ -8,9 +8,10 @@ export interface IFieldProperty {
 }
 
 export interface IOrd extends IEq {
-    _ord:{fields:Array<Field>},
     greater(a:IOrd):boolean,
-    less(a:IOrd):boolean
+    greater(a:IOrd, config:IOrdConfig):boolean,
+    less(a:IOrd):boolean,
+    less(a:IOrd, config:IOrdConfig):boolean
 }
 
 export class Field extends EqField {
@@ -55,14 +56,15 @@ export function isFieldOrd(object:any):object is Field {
 
 const
     _impl = function (method:string) {
-        return function (a:IOrd) {
-            for (let i = 0, j = a._ord.fields.length; i < j; i++) {
-                let val = (a._ord.fields[i][method](this, a));
-                if (val !== null) {
-                    return val;
-                }
+        return function (a:IOrd, config?:IOrdConfig) {
+            if (!config) {
+                throw new Error("Method " + method + " cannot be run without config.");
             }
-            return false;
+            for(let i = 0; i < config.ordFields.length; i++){
+                let val = config.ordFields[i][method](this, a);
+                if (val !== null) return val;
+            }
+            return null;
         }
     },
     implGreater = function (target:Function) {
@@ -71,50 +73,45 @@ const
     implLess = function (target:Function) {
         target.prototype.less = _impl('less');
     }
-;
+    ;
 
-export interface IOrdConfig {
-    fields : Array<Field>
+export interface IOrdConfig extends IEqConfig {
+    ordFields:Array<Field>
+}
+
+export class OrdConfig extends EqConfig implements IOrdConfig {
+
+    protected _ordFields:Array<Field> = [];
+
+    public set fields(fields:Array<IField>) {
+        this._fields = fields;
+        this._fields.forEach((field:Field) => {
+            if (isFieldOrd(field)) {
+                this._ordFields.push(field);
+            }
+        });
+    }
+
+    public get fields():Array<IField> {
+        return (<IField[]> this._ordFields).concat(this._fields);
+    }
+
+    public get ordFields():Array<Field> {
+        return this._ordFields;
+    }
 }
 
 export class Ord extends Eq {
 
-    private static _ord:{fields:Array<Field>} = {fields: []};
+    protected static _ord:{fields:Array<Field>} = {fields: []};
 
-    static implementFields(target:Function) {
-        let _f = [];
-        for (let i = 0, j = Ord._ord.fields.length; i < j; i++) {
-            if (Ord._ord.fields[i] !== undefined) {
-                _f.push(Ord._ord.fields[i]);
-            }
-        }
-
-        if (!('_ord' in Object.getOwnPropertyNames(target.prototype))) {
-            Object.defineProperty(target.prototype, '_ord', {
-                value: {fields: _f}
-            });
-        } else {
-            target.prototype._ord.fields = target.prototype._ord.fields.concat(_f);
-        }
-
-        if (!('_eq' in target.prototype)) {
-            Object.defineProperty(target.prototype, '_eq', {
-                value: {fields: _f}
-            });
-        } else {
-            target.prototype._eq.fields = target.prototype._eq.fields.concat(_f);
-        }
-
-        Ord._ord.fields = [];
-        return _f;
-    }
-
-    static implement(config : IOrdConfig) {
-        return function(target:Function){
-            config.fields = Ord.implementFields(target);
+    static implement(props?:IEqProps) {
+        return (target:Function) => {
+            Eq.implementFields((props) ? <IOrdConfig> props.config : null, Ord._ord.fields);
+            Ord._ord.fields = [];
             implGreater(target);
             implLess(target);
-            Eq.implement(config).apply(this, [target]);
+            Eq.implement(props).apply(this, [target]);
         }
     }
 
@@ -124,47 +121,41 @@ export class Ord extends Eq {
         }
     }
 
-    static sort(cs:IOrd[]):IOrd[] {
+    static sort(cs:IOrd[], config:IOrdConfig):IOrd[] {
         return cs.slice(0).sort((a:IOrd, b:IOrd) => {
-            let val = a.greater(b);
-            return (val === null || (!val && a.eq(b))) ? 0 : ( (val) ? 1 : -1 );
+            let val = a.greater(b, config);
+            return (val === null || (!val && a.eq(b, config))) ? 0 : ( (val) ? 1 : -1 );
         });
     }
 
-    static greater(cs:IOrd[], ref:IOrd):IOrd[] {
+    static greater(cs:IOrd[], ref:IOrd, config:IOrdConfig):IOrd[] {
         return cs.filter((a:IOrd) => {
-            return (ref.less(a));
+            return (ref.less(a, config));
         });
     }
 
-    static less(cs:IOrd[], ref:IOrd):IOrd[] {
+    static less(cs:IOrd[], ref:IOrd, config:IOrdConfig):IOrd[] {
         return cs.filter((a:IOrd) => {
-            return (ref.greater(a));
+            return (ref.greater(a, config));
         });
     }
 
-    static inRange(cs:IOrd[], top:IOrd, bottom:IOrd):IOrd[] {
+    static inRange(cs:IOrd[], top:IOrd, bottom:IOrd, config:IOrdConfig):IOrd[] {
         return cs.filter((a:IOrd) => {
-            return (top.greater(a) !== false && bottom.less(a) !== false);
-        });
-    }
-
-    static setCardinality(cs:IOrd[], name:string, newIndex = 0) {
-        cs.map((item:IOrd) => {
-            let oldKey = item._ord.fields.findIndex((val:EqField) => {
-                return (val.name === name);
-            }), old = item._ord.fields[newIndex];
-            item._ord.fields.splice(newIndex, 0, item._ord.fields.splice(oldKey, 1)[0]);
+            return (top.greater(a, config) !== false && bottom.less(a, config) !== false);
         });
     }
 }
 
 const
     _implAnd = function (method:string) {
-        return function (a:IOrd) {
+        return function (a:IOrd, config:IOrdConfig) {
+            if (!config) {
+                throw new Error("Method " + method + " cannot be run without config.");
+            }
             let res = null;
-            for (let i = 0, j = a._ord.fields.length; i < j; i++) {
-                let val = (a._ord.fields[i][method](this, a));
+            for(let i = 0; i < config.ordFields.length; i++) {
+                let val = config.ordFields[i][method](this, a);
                 if (val !== null) {
                     if (!val) return false;
                     res = true;
@@ -183,12 +174,13 @@ const
 
 export class OrdAnd extends Ord {
 
-    static implement(config : Object = {}) {
-        return function(target:Function){
+    static implement(props?:IEqProps) {
+        return (target:Function) => {
+            Eq.implementFields((props) ? <IOrdConfig> props.config : null, Ord._ord.fields);
+            Ord._ord.fields = [];
             implGreaterAnd(target);
             implLessAnd(target);
-            Ord.implementFields(target);
-            Eq.implement(config).apply(this, [target]);
+            Eq.implement(props).apply(this, [target]);
         }
     }
 }

@@ -47,10 +47,10 @@ export class FilterComponent {
             res = this.listService.list
             ;
         if(Object.keys(this.props.eq).length>0){
-            res = <IOrd[]>EqOr.fuzzyEq(res, eqs);
+            res = <IOrd[]>EqOr.fuzzyEq(res, eqs, this.listService.getConfig());
         }
         if(Object.keys(this.props.top).length>0 || Object.keys(this.props.bottom).length>0){
-            res = Ord.inRange(res, top, bottom);
+            res = Ord.inRange(res, top, bottom, this.listService.getConfig());
         }
         this.listService.result = res;
         this.filtered.emit({});

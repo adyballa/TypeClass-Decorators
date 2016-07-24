@@ -1,11 +1,11 @@
-import {IOrd, Ord} from "../decorators/ord.typeclass";
+import {IOrd, Ord, IOrdConfig, OrdConfig} from "../decorators/ord.typeclass";
 import {Field} from "../decorators/eq.typeclass";
-import {Car} from "../class/car";
 
 export abstract class AbstractListModelService{
 
     protected _list : IOrd[] = [];
     public result : IOrd[] = [];
+    protected _config : IOrdConfig = new OrdConfig();
 
     constructor() {
         this.result = this.list;
@@ -21,8 +21,12 @@ export abstract class AbstractListModelService{
 
     public abstract getModel() : IOrd;
 
+    public getConfig() : IOrdConfig {
+        return this._config;
+    }
+
     get fields() : Field[] {
-        return this.getModel()._eq.fields;
+        return this._config.fields;
     }
 
     get list() : IOrd[] {

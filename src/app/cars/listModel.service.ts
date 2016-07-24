@@ -1,10 +1,12 @@
 import {Injectable} from '@angular/core';
-import {IOrd, isOrd, IOrdConfig} from "../decorators/ord.typeclass";
+import {IOrd, isOrd, OrdConfig, Ord, IOrdConfig} from "../decorators/ord.typeclass";
 import {AbstractListModelService} from "./abstractListModel.service";
-import {Car, CarAnd, Colors, Brands, Interiors, modelConfig} from '../class/car';
+import {Car, CarAnd, Colors, Brands, Interiors, carConfig} from '../class/car';
 
 @Injectable()
 export class ListModelService extends AbstractListModelService {
+
+    protected _config : IOrdConfig = carConfig;
 
     public createItem(props:any = {}):IOrd {
         let {engine = null, color = null, brand = null, interior = null, date = null} = props;
@@ -42,7 +44,6 @@ export class ListModelService extends AbstractListModelService {
     protected getList():Promise<IOrd[]> {
         let cars = new Array(3500);
 
-
         for (let i = 0; i < cars.length; i++) {
             cars[i] = {
                 engine: Math.ceil(Math.random() * (i + 1) * 5),
@@ -52,7 +53,6 @@ export class ListModelService extends AbstractListModelService {
                 date: Date.now()-Math.random()*1000000000000
             };
         }
-        console.log("COnfig ist ", modelConfig);
         return Promise.resolve(cars.map((props) => this.createItem(props)));
     }
 }
