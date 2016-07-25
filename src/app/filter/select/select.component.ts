@@ -1,5 +1,5 @@
 import {Component, Input, Output, EventEmitter} from '@angular/core';
-import {Field} from "../../decorators/eq.typeclass";
+import {EqField} from "../../decorators/eq.typeclass";
 import {FilterProperties} from "../filter.component";
 
 @Component({
@@ -14,7 +14,7 @@ export class SelectComponent {
     public filterChange : EventEmitter<any> = new EventEmitter();
 
     @Input()
-    public field:Field;
+    public field:EqField;
 
     @Input()
     public props:FilterProperties;

@@ -1,5 +1,5 @@
 import {Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef, AfterViewInit} from '@angular/core';
-import {Field, EqConfig} from "../../decorators/eq.typeclass";
+import {EqField, EqConfig} from "../../decorators/eq.typeclass";
 import {Field as OrdField, Ord} from "../../decorators/ord.typeclass";
 import {ListModelService} from "../../cars/listModel.service";
 
@@ -21,7 +21,7 @@ export class SortComponent implements OnInit, AfterViewInit {
     private cardinality:number;
 
     @Input()
-    private field:Field;
+    private field:EqField;
 
     @Input()
     private ordFields:OrdField[];

@@ -1,5 +1,5 @@
 import {IOrd, Ord, IOrdConfig, OrdConfig} from "../decorators/ord.typeclass";
-import {Field} from "../decorators/eq.typeclass";
+import {EqField} from "../decorators/eq.typeclass";
 
 export abstract class AbstractListModelService{
 
@@ -25,7 +25,7 @@ export abstract class AbstractListModelService{
         return this._config;
     }
 
-    get fields() : Field[] {
+    get fields() : EqField[] {
         return this._config.fields;
     }
 

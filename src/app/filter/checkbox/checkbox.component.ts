@@ -2,7 +2,7 @@ import {
     Component, Output, Input, EventEmitter, ViewChildren, QueryList, AfterViewInit,
     ElementRef
 } from '@angular/core';
-import {Field} from "../../decorators/eq.typeclass";
+import {EqField} from "../../decorators/eq.typeclass";
 import {FilterProperties} from "../filter.component";
 
 @Component({
@@ -20,7 +20,7 @@ export class CheckboxComponent implements AfterViewInit {
     public filterChange:EventEmitter<any> = new EventEmitter(true);
 
     @Input()
-    public field:Field;
+    public field:EqField;
 
     @Input()
     public props:FilterProperties;

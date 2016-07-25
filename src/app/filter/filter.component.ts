@@ -1,7 +1,7 @@
 import {Component, Output, EventEmitter} from '@angular/core';
 import {Ord, isFieldOrd, IOrd} from "../decorators/ord.typeclass";
 import {ListModelService} from "../cars/listModel.service";
-import {Field, EqOr} from "../decorators/eq.typeclass";
+import {EqField, EqOr} from "../decorators/eq.typeclass";
 import {RangeComponent} from "./range/range.component";
 import {SelectRangeComponent} from "./selectRange/selectRange.component";
 import {SelectComponent} from "./select/select.component";
@@ -31,7 +31,7 @@ export class FilterComponent {
 
     public props:FilterProperties = {top:{},bottom:{},eq:{}};
 
-    public fields:Field[];
+    public fields:EqField[];
 
     private _model:IOrd;
 
@@ -56,7 +56,7 @@ export class FilterComponent {
         this.filtered.emit({});
     }
 
-    public createField(field:Field):string {
+    public createField(field:EqField):string {
         if (isFieldOrd(field) && field.map.length > 0) {
             return "select";
         }
