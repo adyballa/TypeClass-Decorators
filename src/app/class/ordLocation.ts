@@ -5,28 +5,20 @@ import {IEqConfig, IEq} from "../decorators/eq.typeclass";
  */
 
 function isLocation(object:any):object is Location {
-    return (typeof object === "object" && '_x' in object && '_y' in object && '_distance' in object);
+    return (typeof object === "object" && 'x' in object && 'y' in object && '_distance' in object);
 }
 
 export class OrdLocation implements IOrd {
 
-    private _x:number;
-    private _y:number;
+    public x:number;
+    public y:number;
 
     private _distance:number;
 
     constructor(x:number, y:number, dist:number) {
-        this._x = Math.floor(x);
-        this._y = Math.floor(y);
+        this.x = Math.floor(x);
+        this.y = Math.floor(y);
         this._distance = Math.floor(dist);
-    }
-
-    get x():number {
-        return this._x;
-    }
-
-    get y():number {
-        return this._y;
     }
 
     set distance(dist:number) {
@@ -51,7 +43,7 @@ export class OrdLocation implements IOrd {
 
     eq(a:IEq, config?:IEqConfig):boolean {
         if (isLocation(a)) {
-            let d = Math.pow(Math.abs((<OrdLocation> a).x - this._x) + Math.abs((<OrdLocation> a).y - this._y), 2);
+            let d = Math.pow(Math.abs((<OrdLocation> a).x - this.x) + Math.abs((<OrdLocation> a).y - this.y), 2);
             return (d<=this._distance);
         }
         return null;
@@ -63,6 +55,6 @@ export class OrdLocation implements IOrd {
     }
 
     toString():string{
-        return "x:"+this._x+" y:"+this._y+" d:"+this._distance;
+        return "x:"+this.x+" y:"+this.y+" d:"+this._distance;
     }
 }

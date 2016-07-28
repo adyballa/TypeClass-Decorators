@@ -46,16 +46,20 @@ export class Car implements IOrd {
     })
     private location:OrdLocation;
 
-    @Eq.field
+    @Eq.field({fuzzy:true})
+    private name:string;
+
+    @Eq.field({})
     private interior:TInterior;
 
-    constructor(engine?:number, color?:TColor, brand?:TBrand, interior?:TInterior, timestamp?:number, location?:OrdLocation) {
+    constructor(engine?:number, color?:TColor, brand?:TBrand, interior?:TInterior, timestamp?:number, location?:OrdLocation,name?:string) {
         this.engine = engine;
         this.color = color;
         this.brand = brand;
         this.interior = interior;
         this.date = (timestamp === null) ? null : new Date(timestamp);
         this.location = location;
+        this.name = name;
     };
 
     greater:(a:IOrd)=>boolean;

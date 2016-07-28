@@ -9,6 +9,7 @@ import {CheckboxComponent} from "./checkbox/checkbox.component";
 import {DateRangeComponent} from "./date-range/date-range.component";
 import {DateComponent} from "./date/date.component";
 import {OrdlocationComponent} from "./ordlocation/ordlocation.component";
+import {TextComponent} from "./text/text.component";
 
 export interface FilterProperty{
     [name:string] : (string|number|Array<string|number>)
@@ -24,7 +25,8 @@ export interface FilterProperties{
     selector: 'my-filter',
     templateUrl: 'filter.component.html',
     styleUrls: ['filter.component.css'],
-    directives: [ RangeComponent, SelectRangeComponent, SelectComponent, CheckboxComponent, DateRangeComponent, DateComponent, OrdlocationComponent ]
+    directives: [ RangeComponent, SelectRangeComponent, SelectComponent, CheckboxComponent,
+        DateRangeComponent, DateComponent, OrdlocationComponent, TextComponent ]
 })
 export class FilterComponent {
     @Output()
@@ -73,7 +75,12 @@ export class FilterComponent {
                 return m[1].toLowerCase();
             }
         }else{
-            return typeof this._model[field.name];
+            switch(typeof this._model[field.name]){
+                case "string":
+                    return (this.getOptions(field.name)) ? "string-options" : "string";
+                case "number":
+                    return "number";
+            }
         }
     }
 

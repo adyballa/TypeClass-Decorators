@@ -99,6 +99,7 @@ const
 
 export interface IOrdConfig extends IEqConfig {
     ordFields:Array<Field>
+    eqFields:Array<EqField>
 }
 
 export class OrdConfig extends EqConfig implements IOrdConfig {
@@ -116,6 +117,10 @@ export class OrdConfig extends EqConfig implements IOrdConfig {
 
     public get fields():Array<IField> {
         return (<IField[]> this._ordFields).concat(this._fields);
+    }
+
+    public get eqFields():Array<EqField> {
+        return this._fields;
     }
 
     public get ordFields():Array<Field> {

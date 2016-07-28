@@ -17,9 +17,12 @@
                     </template>
                 </div>
             </template>
-            <template ngSwitchCase="string">
+            <template ngSwitchCase="string-options">
                 <field-checkbox (filterChange)="filter()" [field]="field" [props]="props"
                                 [options]="getOptions(field.name)"></field-checkbox>
+            </template>
+            <template ngSwitchCase="string">
+                <field-text (filterChange)="filter()" [field]="field" [props]="props"></field-text>
             </template>
             <template ngSwitchCase="date">
                 <field-date (filterChange)="filter()" [field]="field" [props]="props" [options]="getOptions(field.name)"></field-date>

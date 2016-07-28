@@ -1,5 +1,6 @@
 <div>
-  X: <input type="number" [(ngModel)]="props.eq[field.name].x" name="{{ field.name }}_x" (change)="update()" />
-  Y: <input type="number" [(ngModel)]="props.eq[field.name].y" name="{{ field.name }}_y" (change)="update()" />
-  Distanz: <input type="number" [(ngModel)]="distance" name="{{ field.name }}_distance" (change)="update()" />
+  Umkreissuche?:<input type="checkbox" name="{{ field.name }}_null" [(ngModel)]="isNull"  />
+  X: <input type="number" [disabled]="isNull" [(ngModel)]="_location.x" name="{{ field.name }}_x" (change)="update()" />
+  Y: <input type="number" [disabled]="isNull" [(ngModel)]="_location.y" name="{{ field.name }}_y" (change)="update()" />
+  Distanz: <input type="number" [disabled]="isNull" [(ngModel)]="distance" name="{{ field.name }}_distance" (change)="update()" />
 </div>

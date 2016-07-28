@@ -5,6 +5,10 @@ export interface IEq {
     neq(a:IEq, config:IEqConfig): boolean;
 }
 
+export interface IFieldProperty {
+    fuzzy?:boolean
+}
+
 export function isEq(object:any):object is IEq {
     return (typeof object === 'object' && 'eq' in object && 'neq' in object);
 }
@@ -22,11 +26,8 @@ export class EqField implements IField{
 
     public eq(a:IEq, b:IEq):boolean {
         let vals = [this.value(a), this.value(b)];
-        if (vals[0] === null || vals[1] === null) {
-            return null;
-        }else{
-            return (isEq(vals[0])) ? (<IEq> vals[0]).eq(<IEq> vals[1]) : vals[0] === vals[1];
-        }
+        return (vals[0] === null || vals[1] === null) ? null :
+            (isEq(vals[0])) ? (<IEq> vals[0]).eq(<IEq> vals[1]) : (vals[0] === vals[1]);
     }
 
     public neq(a:IEq, b:IEq):boolean {
@@ -36,6 +37,26 @@ export class EqField implements IField{
 
     public value(object:IEq):number | string | IEq {
         return object[this.name];
+    }
+}
+
+export class FuzzyEqField extends EqField{
+
+    public eq(a:IEq, b:IEq):boolean {
+        let vals = [this.value(a), this.value(b)];
+        if (vals[0] === null || vals[1] === null) {
+            return null;
+        }else{
+            if(isEq(vals[0])){
+                return (<IEq> vals[0]).eq(<IEq> vals[1])
+            }else{
+                if(vals[0] === vals[1]){
+                    return true;
+                }else{
+                    return ((typeof vals[0] === "string") && ((<string> vals[1]).indexOf(<string> vals[0])>-1)) ? null : false;
+                }
+            }
+        }
     }
 }
 
@@ -118,8 +139,10 @@ export class Eq {
         }
     }
 
-    static field(target:Object, propertyKey:string) {
-        Eq._eq.fields.push(new EqField(propertyKey));
+    static field(props:IFieldProperty) {
+        return function (target:Object, propertyKey:string) {
+            Eq._eq.fields.push(("fuzzy" in props && props.fuzzy) ? new FuzzyEqField(propertyKey) : new EqField(propertyKey));
+        }
     }
 
     static eq(cs:IEq[], ref:IEq, config:IEqConfig):IEq[] {

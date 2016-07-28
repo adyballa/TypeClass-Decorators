@@ -10,21 +10,21 @@ export class ListModelService extends AbstractListModelService {
     protected _config : IOrdConfig = carConfig;
 
     public createItem(props:any = {}):IOrd {
-        let {engine = null, color = null, brand = null, interior = null, date = null, location = null} = props;
-        return this.createItemByParams(Car, [engine,color,brand,interior,date,location]);
+        let {engine = null, color = null, brand = null, interior = null, date = null, location = null, name = null} = props;
+        return this.createItemByParams(Car, [engine,color,brand,interior,date,location,name]);
     }
 
     public createItems(props:any = {}):IOrd[] {
-        let {engine = null, color = null, brand = null, interior = null, date = null, location = null} = props, res = [];
-        this.formatProps([engine,color,brand,interior, date,location]).forEach((propsRow : Array<any>) => {
+        let {engine = null, color = null, brand = null, interior = null, date = null, location = null, name = null} = props, res = [];
+        this.formatProps([engine,color,brand,interior, date,location,name]).forEach((propsRow : Array<any>) => {
             res.push(this.createItemByParams(Car, propsRow));
         });
         return res;
     }
 
     public createAndItem(props:any = {}):IOrd {
-        let {engine = null, color = null, brand = null, interior = null, date = null, location = null} = props;
-        return this.createItemByParams(CarAnd, [engine,color,brand,interior,date,location]);
+        let {engine = null, color = null, brand = null, interior = null, date = null, location = null, name = null} = props;
+        return this.createItemByParams(CarAnd, [engine,color,brand,interior,date,location,name]);
     }
 
     public getOptions(name:string):Array<string> {
@@ -39,7 +39,14 @@ export class ListModelService extends AbstractListModelService {
     }
 
     public getModel():IOrd {
-        return this.createItemByParams(Car, [12, "red", "bmw", "leder", Date.now(), new OrdLocation(100,100,100)]);
+        return this.createItemByParams(Car, [12, "red", "bmw", "leder", Date.now(), new OrdLocation(100,100,100),"model"]);
+    }
+
+    private randomString(len : number = 5, possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"){
+        let text='';
+        for( let i=0; i < len; i++ )
+            text += possible.charAt(Math.floor(Math.random() * possible.length));
+        return text;
     }
 
     protected getList():Promise<IOrd[]> {
@@ -52,7 +59,8 @@ export class ListModelService extends AbstractListModelService {
                 brand: Brands[Math.floor(Math.random() * Brands.length)],
                 interior: Interiors[Math.floor(Math.random() * Interiors.length)],
                 date: Date.now()-Math.random()*1000000000000,
-                location: new OrdLocation(Math.random()*100,Math.random()*100,Math.random()*1000)
+                location: new OrdLocation(Math.random()*100,Math.random()*100,Math.random()*1000),
+                name: this.randomString()
             };
         }
         return Promise.resolve(cars.map((props) => this.createItem(props)));
