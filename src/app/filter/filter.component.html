@@ -24,6 +24,9 @@
             <template ngSwitchCase="date">
                 <field-date (filterChange)="filter()" [field]="field" [props]="props" [options]="getOptions(field.name)"></field-date>
             </template>
+            <template ngSwitchCase="ordlocation">
+                <field-ordlocation (filterChange)="filter()" [field]="field" [props]="props" [options]="getOptions(field.name)"></field-ordlocation>
+            </template>
             <template ngSwitchCase="date-range">
                 <field-date-range (filterChange)="filter()" [field]="field" [props]="props"></field-date-range>
             </template>

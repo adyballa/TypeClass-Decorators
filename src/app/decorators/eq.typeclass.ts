@@ -6,24 +6,27 @@ export interface IEq {
 }
 
 export function isEq(object:any):object is IEq {
-    return ('eq' in object && 'neq' in object);
+    return (typeof object === 'object' && 'eq' in object && 'neq' in object);
 }
 
 export interface IField{
     name:string;
     eq:(a:IEq, b:IEq)=>boolean;
     neq:(a:IEq, b:IEq)=>boolean;
-    value:(object:IEq)=>number | string
+    value:(object:IEq)=>number | string | IEq;
 }
 
 export class EqField implements IField{
 
-    constructor(public name:string) {
-    }
+    constructor(public name:string) {}
 
     public eq(a:IEq, b:IEq):boolean {
         let vals = [this.value(a), this.value(b)];
-        return (vals[0] === vals[1]) ? true : (vals[0] === null || vals[1] === null) ? null : false;
+        if (vals[0] === null || vals[1] === null) {
+            return null;
+        }else{
+            return (isEq(vals[0])) ? (<IEq> vals[0]).eq(<IEq> vals[1]) : vals[0] === vals[1];
+        }
     }
 
     public neq(a:IEq, b:IEq):boolean {
@@ -31,7 +34,7 @@ export class EqField implements IField{
         return (val === null) ? null : !val;
     }
 
-    public value(object:IEq):number | string {
+    public value(object:IEq):number | string | IEq {
         return object[this.name];
     }
 }

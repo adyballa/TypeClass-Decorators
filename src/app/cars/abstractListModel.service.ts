@@ -1,5 +1,6 @@
-import {IOrd, Ord, IOrdConfig, OrdConfig} from "../decorators/ord.typeclass";
+import {IOrd, IOrdConfig, OrdConfig} from "../decorators/ord.typeclass";
 import {EqField} from "../decorators/eq.typeclass";
+import * as _ from 'lodash';
 
 export abstract class AbstractListModelService{
 
@@ -22,7 +23,8 @@ export abstract class AbstractListModelService{
     public abstract getModel() : IOrd;
 
     public getConfig() : IOrdConfig {
-        return this._config;
+//        return this._config;
+        return _.cloneDeep(this._config);
     }
 
     get fields() : EqField[] {

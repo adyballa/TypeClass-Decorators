@@ -1,9 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {ListModelService} from './listModel.service';
-import {Ord, IOrd, IOrdConfig} from '../decorators/ord.typeclass';
+import {Ord, IOrd, IOrdConfig, Field} from '../decorators/ord.typeclass';
 import {FilterComponent} from "../filter/filter.component";
 import {Car} from "../class/car";
-import {SortComponent, IDirection} from "../filter/sort/sort.component";
+import {SortComponent} from "../filter/sort/sort.component";
 
 @Component({
     moduleId: module.id,
@@ -22,45 +22,27 @@ export class CarsComponent implements OnInit {
 
     private _result:Car[];
 
-    public dir : IDirection = {
-        state:"ASC"
-    };
-
-    private sortField : SortComponent;
+    private _config:IOrdConfig;
 
     constructor(private listService:ListModelService) {
         this.model = this.listService.getModel();
+        this._config = this.listService.getConfig();
     }
 
     ngOnInit():any {
         this.calculate();
     }
 
-    public sortFieldChange(sort : SortComponent){
-        if(this.sortField){
-            this.sortField.state = false;
-        }
-        this.sortField = sort;
-        this.sortField.dir = this.dir;
-        this.sortField.setIcon();
-        this.sortField.state = true;
-        this.calculate();
-    }
-
-    public directionChange(dir : IDirection){
-        this.dir = dir;
+    public fieldChange(){
         this.calculate();
     }
 
     public calculate(){
-        this._result  = <Car[]> Ord.sort(this.listService.result, this.listService.getConfig());
-        if(this.dir.state === "DESC"){
-            this._result.reverse();
-        }
+        this._result  = <Car[]> Ord.sort(this.listService.result, this._config);
     }
 
     public get config() : IOrdConfig {
-        return this.listService.getConfig();
+        return this._config;
     }
 
     public get result() : Car[] {
@@ -69,6 +51,6 @@ export class CarsComponent implements OnInit {
 
     public get less() {
         let top = {engine:50, color:'red', brand:'pontiac', interior:'plastic'};
-        return Ord.less(this.listService.result, this.listService.createItem(top), this.listService.getConfig());
+        return Ord.less(this.listService.result, this.listService.createItem(top), this._config);
     }
 }

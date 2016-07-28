@@ -4,8 +4,11 @@ export {EqField, IEq, isEq, Eq};
 
 export interface IFieldProperty {
     cardinality:number,
+    dir?:TDirection,
     map?:Array<string>
 }
+
+export type TDirection = "ASC" | "DESC";
 
 export interface IOrd extends IEq {
     greater(a:IOrd):boolean,
@@ -16,24 +19,43 @@ export interface IOrd extends IEq {
 
 export class Field extends EqField {
 
+    public dir:TDirection;
+
     public map:Array<string>;
 
     constructor(public name:string, props:IFieldProperty) {
         super(name);
         this.map = ('map' in props) ? props.map : [];
+        this.dir = ('dir' in props) ? props.dir : "ASC"
     }
 
     public greater(a:IOrd, b:IOrd):boolean {
         let vals = [this.value(a), this.value(b)];
-        return (vals[0] === null || vals[1] === null || vals[0] === vals[1]) ? null : (vals[0] > vals[1]);
+        if (vals[0] === null || vals[1] === null || vals[0] === vals[1]) {
+            return null;
+        }else{
+            if(isOrd(vals[0])){
+                return (this.dir == "ASC") ? (<IOrd> vals[0]).greater(<IOrd> vals[1]) : (<IOrd> vals[0]).less(<IOrd> vals[1]);
+            }else{
+                return (this.dir == "ASC") ? (vals[0] > vals[1]) : (vals[0] < vals[1]);
+            }
+        }
     }
 
     public less(a:IOrd, b:IOrd):boolean {
         let vals = [this.value(a), this.value(b)];
-        return (vals[0] === null || vals[1] === null || vals[0] === vals[1]) ? null : (vals[0] < vals[1]);
+        if (vals[0] === null || vals[1] === null || vals[0] === vals[1]) {
+            return null;
+        }else{
+            if(isOrd(vals[0])){
+                return (this.dir == "ASC") ? (<IOrd> vals[0]).less(b) : (<IOrd> vals[0]).greater(b);
+            }else{
+                return (this.dir == "ASC") ? (vals[0] < vals[1]) : (vals[0] > vals[1]);
+            }
+        }
     }
 
-    public value(object:IOrd):number|string {
+    public value(object:IOrd):number|string|IEq {
         let val = object[this.name];
         if (val === null) {
             return null;
@@ -47,7 +69,7 @@ export class Field extends EqField {
 }
 
 export function isOrd(object:any):object is IOrd {
-    return ('greater' in object && 'less' in object);
+    return (typeof object === "object" && 'greater' in object && 'less' in object);
 }
 
 export function isFieldOrd(object:any):object is Field {

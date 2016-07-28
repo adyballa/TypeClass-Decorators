@@ -1,4 +1,4 @@
 <div [ngSwitch]="fieldType()">
-    <a *ngSwitchCase="'ord'" (click)="sort($event,field.name)">{{ field.name }}<a class="glyphicon glyphicon-chevron-down" style="visibility: hidden" (click)="changeDir()" #icon></a></a>
+    <a *ngSwitchCase="'ord'" (click)="sort($event,field.name)">{{ field.name }}</a><a class="glyphicon glyphicon-chevron-down" (click)="changeDir()" #icon></a>
     <span *ngSwitchCase="'eq'">{{ field.name }}</span>
 </div>

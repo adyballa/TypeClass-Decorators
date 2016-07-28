@@ -1,13 +1,7 @@
 import {Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef, AfterViewInit} from '@angular/core';
-import {EqField, EqConfig} from "../../decorators/eq.typeclass";
-import {Field as OrdField, Ord} from "../../decorators/ord.typeclass";
+import {EqField, EqConfig, IField} from "../../decorators/eq.typeclass";
+import {Field as OrdField, isFieldOrd, TDirection, IOrdConfig} from "../../decorators/ord.typeclass";
 import {ListModelService} from "../../cars/listModel.service";
-
-export type TDirection = "ASC" | "DESC";
-
-export interface IDirection{
-    state:TDirection
-};
 
 @Component({
     moduleId: module.id,
@@ -27,61 +21,51 @@ export class SortComponent implements OnInit, AfterViewInit {
     private ordFields:OrdField[];
 
     @Output()
-    public sortFieldChange:EventEmitter<any> = new EventEmitter(true);
-
-    @Output()
-    public directionChange:EventEmitter<any> = new EventEmitter(true);
-
-    @Input()
-    public dir:IDirection;
+    public fieldChange:EventEmitter<any> = new EventEmitter(true);
 
     @ViewChild('icon')
     private icon:ElementRef;
 
-    constructor(private listService:ListModelService) {
-    }
+    constructor(private listService:ListModelService) {}
 
     ngOnInit() {
     }
 
     ngAfterViewInit():any {
-        if(this.cardinality === 0){
-            this.sortFieldChange.emit(this);
+        if (this.cardinality === 0) {
+            this.fieldChange.emit(null);
         }
+        this.setIcon();
     }
 
     public sort(event:Event, fieldName:string) {
-        if(!this.state){
-            EqConfig.setCardinalityOfField(fieldName, this.listService.getConfig().ordFields);
-            this.sortFieldChange.emit(this);
+        EqConfig.setCardinalityOfField(fieldName, this.ordFields);
+        this.fieldChange.emit(null);
+    }
+
+    private getOrdField() : OrdField{
+        return (isFieldOrd(this.field)) ? <OrdField> this.field : null;
+    }
+
+    public setIcon() {
+        const f = this.getOrdField();
+        if (this.icon && f) {
+            this.icon.nativeElement.classList.remove("glyphicon-chevron-" + ((f.dir === "ASC") ? "up" : "down"));
+            this.icon.nativeElement.classList.add("glyphicon-chevron-" + ((f.dir === "ASC") ? "down" : "up"));
         }
     }
 
-    public setIcon(){
-        if(this.icon){
-            this.icon.nativeElement.classList.remove("glyphicon-chevron-"+((this.dir.state === "ASC") ? "up" : "down"));
-            this.icon.nativeElement.classList.add("glyphicon-chevron-"+((this.dir.state === "ASC") ? "down" : "up"));
+    private setDir(dir:TDirection | "SWAP") {
+        const f = this.getOrdField();
+        if (f) {
+            f.dir = <TDirection>((dir === "SWAP") ? ( (f.dir === "ASC") ? "DESC" : "ASC" ) : dir);
+            this.setIcon();
+            this.fieldChange.emit(null);
         }
     }
 
-    private setDir(dir : TDirection | "SWAP"){
-        this.dir.state = <TDirection>((dir === "SWAP") ? ( (this.dir.state === "ASC") ? "DESC" : "ASC" ) : dir);
-        this.setIcon();
-        this.directionChange.emit(this.dir);
-    }
-
-    public changeDir(){
+    public changeDir() {
         this.setDir("SWAP");
-    }
-
-    public set state(fActive : boolean){
-        if(this.icon){
-            this.icon.nativeElement.style.visibility = (fActive) ? "visible" : "hidden";
-        }
-    }
-
-    public get state() : boolean{
-        return (this.icon.nativeElement.style.visibility === "visible");
     }
 
     public fieldType():string {

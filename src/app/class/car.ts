@@ -3,6 +3,7 @@
  */
 import {Ord, Eq, IOrd, OrdAnd, OrdConfig} from "../decorators/ord.typeclass";
 import {IEq} from "../decorators/eq.typeclass";
+import {OrdLocation} from "./ordLocation";
 
 type TColor = "yellow" | "red" | "blue";
 type TBrand = "bmw" | "pontiac" | "honda";
@@ -40,15 +41,21 @@ export class Car implements IOrd {
     })
     private date:Date;
 
+    @Ord.field({
+        cardinality: 5
+    })
+    private location:OrdLocation;
+
     @Eq.field
     private interior:TInterior;
 
-    constructor(engine?:number, color?:TColor, brand?:TBrand, interior?:TInterior, timestamp?:number) {
+    constructor(engine?:number, color?:TColor, brand?:TBrand, interior?:TInterior, timestamp?:number, location?:OrdLocation) {
         this.engine = engine;
         this.color = color;
         this.brand = brand;
         this.interior = interior;
         this.date = (timestamp === null) ? null : new Date(timestamp);
+        this.location = location;
     };
 
     greater:(a:IOrd)=>boolean;
