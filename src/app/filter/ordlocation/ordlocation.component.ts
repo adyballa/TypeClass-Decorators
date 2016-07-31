@@ -1,7 +1,6 @@
 import {Component, Output, Input, EventEmitter, OnInit} from '@angular/core';
 import {Field} from "../../decorators/ord.typeclass";
 import {OrdLocation} from "../../class/ordLocation";
-import * as _ from 'lodash';
 
 @Component({
     moduleId: module.id,
@@ -20,25 +19,25 @@ export class OrdlocationComponent implements OnInit {
     @Input()
     public props:Object;
 
-    private _location:OrdLocation;
+    private _location:OrdLocation = new OrdLocation(10,10,100);
 
-    private _isNull:boolean=true;
+    private _isActive:boolean;
 
     public update() {
         this.filterChange.emit(this.props);
     }
 
-    private get isNull():boolean{
-        return this._isNull;
+    private get isActive():boolean{
+        return this._isActive;
     }
 
-    private set isNull(isNull:boolean){
-        this._isNull = isNull;
-        if(isNull){
+    private set isActive(isActive:boolean){
+        this._isActive = isActive;
+        if(isActive){
+            this.props["eq"][this.field.name] = this._location;
+        }else{
             this._location = this.props["eq"][this.field.name];
             this.props["eq"][this.field.name] = null;
-        }else{
-            this.props["eq"][this.field.name] = this._location;
         }
         this.update();
     }
@@ -53,6 +52,7 @@ export class OrdlocationComponent implements OnInit {
 
     ngOnInit():any {
         this._location = new OrdLocation(10,10,100);
+        this._isActive = false;
         return null;
     }
 }

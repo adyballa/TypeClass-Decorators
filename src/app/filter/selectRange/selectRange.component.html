@@ -2,11 +2,11 @@
     <label>{{ field.name }} von:</label>
     <select id="{{ field.name }}_von" name="{{ field.name }}_von" (change)="update('bottom', $event)" >
         <option value="">bitte wählen</option>
-        <option *ngFor="let val of field.map">{{ val }}</option>
+        <option *ngFor="let val of field.map" value="{{val}}">{{ val }}<span class="counter">[{{ _count[val]|async }}]</span></option>
     </select>
     <label>{{ field.name }} bis:</label>
     <select id="{{ field.name }}_bis" name="{{ field.name }}_bis" (change)="update('top', $event)">
         <option value="">bitte wählen</option>
-        <option *ngFor="let val of field.map">{{ val }}</option>
+        <option *ngFor="let val of field.map" value="{{val}}">{{ val }}<span class="counter">[{{ _count[val]|async }}]</span></option>
     </select>
 </div>

@@ -1,9 +1,11 @@
 export interface IEq {
     eq(a:IEq):boolean,
-    eq(a:IEq, config:IEqConfig): boolean;
+    eq(a:IEq, config:IEqConfig):boolean;
     neq(a:IEq):boolean
-    neq(a:IEq, config:IEqConfig): boolean;
+    neq(a:IEq, config:IEqConfig):boolean;
 }
+
+export type TFieldValue = number | string | IEq;
 
 export interface IFieldProperty {
     fuzzy?:boolean
@@ -13,16 +15,17 @@ export function isEq(object:any):object is IEq {
     return (typeof object === 'object' && 'eq' in object && 'neq' in object);
 }
 
-export interface IField{
+export interface IField {
     name:string;
     eq:(a:IEq, b:IEq)=>boolean;
     neq:(a:IEq, b:IEq)=>boolean;
-    value:(object:IEq)=>number | string | IEq;
+    value:(object:IEq)=>TFieldValue;
 }
 
-export class EqField implements IField{
+export class EqField implements IField {
 
-    constructor(public name:string) {}
+    constructor(public name:string) {
+    }
 
     public eq(a:IEq, b:IEq):boolean {
         let vals = [this.value(a), this.value(b)];
@@ -35,56 +38,30 @@ export class EqField implements IField{
         return (val === null) ? null : !val;
     }
 
-    public value(object:IEq):number | string | IEq {
+    public value(object:IEq):TFieldValue {
         return object[this.name];
     }
 }
 
-export class FuzzyEqField extends EqField{
+export class FuzzyEqField extends EqField {
 
     public eq(a:IEq, b:IEq):boolean {
         let vals = [this.value(a), this.value(b)];
         if (vals[0] === null || vals[1] === null) {
             return null;
-        }else{
-            if(isEq(vals[0])){
+        } else {
+            if (isEq(vals[0])) {
                 return (<IEq> vals[0]).eq(<IEq> vals[1])
-            }else{
-                if(vals[0] === vals[1]){
+            } else {
+                if (vals[0] === vals[1]) {
                     return true;
-                }else{
-                    return ((typeof vals[0] === "string") && ((<string> vals[1]).indexOf(<string> vals[0])>-1)) ? null : false;
+                } else {
+                    return ((typeof vals[0] === "string") && ((<string> vals[1]).indexOf(<string> vals[0]) > -1)) ? null : false;
                 }
             }
         }
     }
 }
-
-const
-    _impl = function (method:string) {
-        return function (a:any, config?:IEqConfig) {
-            let res = null;
-            if (!config) {
-                throw new Error("Method " + method + " cannot be run without config.");
-            }
-            for(let i = 0; i < config.fields.length; i++){
-                let val = config.fields[i][method](this, a);
-                if (val !== null) {
-                    if (!val) return false;
-                    res = true;
-                }
-            }
-            return res;
-        }
-    },
-    implEq = function (target:Function) {
-        target.prototype.eq = _impl("eq");
-    },
-    implNeq = function (target:Function) {
-        target.prototype.neq = _impl("neq");
-    }
-    ;
-
 
 export interface IEqConfig {
     fields:Array<IField>,
@@ -94,15 +71,15 @@ export class EqConfig implements IEqConfig {
 
     protected _fields:Array<IField> = [];
 
-    public get fields():Array<IField>{
+    public get fields():Array<IField> {
         return this._fields;
     }
 
-    public set fields(fields:Array<IField>){
+    public set fields(fields:Array<IField>) {
         this._fields = fields;
     }
 
-    public static setCardinalityOfField(name:string, fields : Array<IField>, newIndex = 0) {
+    public static setCardinalityOfField(name:string, fields:Array<IField>, newIndex = 0) {
         let oldKey = fields.findIndex((field:IField) => {
             return (field.name === name);
         });
@@ -110,38 +87,55 @@ export class EqConfig implements IEqConfig {
     }
 }
 
-export interface IEqProps{
-    config? : IEqConfig;
+export interface IEqProps {
+    config?:IEqConfig;
 }
 
 export class Eq {
 
-    protected static _eq:{fields:Array<EqField>} = {fields:[]};
+    protected static _eq:{fields:Array<EqField>} = {fields: []};
 
-    static implementFields(config?:IEqConfig, fields : Array<EqField> = []) {
+    protected static _impl(method:string) {
+        return function (a:any, config?:IEqConfig) {
+            let res = null;
+            if (!config) {
+                throw new Error("Method " + method + " cannot be run without config.");
+            }
+            for (let field of config.fields) {
+                let val = field[method](this, a);
+                if (val !== null) {
+                    if (!val) return false;
+                    res = true;
+                }
+            }
+            return res;
+        }
+    }
+
+    static implementFields(config?:IEqConfig, fields:Array<EqField> = []) {
         let _f = [];
         for (let i = 0, j = fields.length; i < j; i++) {
             if (fields[i] !== undefined) {
                 _f.push(fields[i]);
             }
         }
-        if(config){
+        if (config) {
             config.fields = _f;
-        }
-    }
-
-    static implement(props? : IEqProps){
-        return (target:Function) => {
-            Eq.implementFields((props) ? props.config : null , Eq._eq.fields);
-            Eq._eq.fields = [];
-            implEq(target);
-            implNeq(target);
         }
     }
 
     static field(props:IFieldProperty) {
         return function (target:Object, propertyKey:string) {
             Eq._eq.fields.push(("fuzzy" in props && props.fuzzy) ? new FuzzyEqField(propertyKey) : new EqField(propertyKey));
+        }
+    }
+
+    static implement(props?:IEqProps) {
+        return (target:Function) => {
+            Eq.implementFields((props) ? props.config : null, Eq._eq.fields);
+            Eq._eq.fields = [];
+            target.prototype.eq = this._impl("eq");
+            target.prototype.neq = this._impl("neq");
         }
     }
 

@@ -1,7 +1,7 @@
 /**
  * Created by Andreas on 14.07.2016.
  */
-import {Ord, Eq, IOrd, OrdAnd, OrdConfig} from "../decorators/ord.typeclass";
+import {Ord, Eq, IOrd, OrdConfig, OrdAnd} from "../decorators/ord.typeclass";
 import {IEq} from "../decorators/eq.typeclass";
 import {OrdLocation} from "./ordLocation";
 

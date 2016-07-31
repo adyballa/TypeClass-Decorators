@@ -1,5 +1,5 @@
 import {Component, Input, Output, EventEmitter} from '@angular/core';
-import {EqField} from "../../decorators/eq.typeclass";
+import {EqField, IField} from "../../decorators/eq.typeclass";
 import {FilterProperties} from "../filter.component";
 
 @Component({
@@ -11,7 +11,7 @@ import {FilterProperties} from "../filter.component";
 export class SelectComponent {
 
     @Output()
-    public filterChange : EventEmitter<any> = new EventEmitter();
+    public filterChange : EventEmitter<IField> = new EventEmitter<IField>();
 
     @Input()
     public field:EqField;
@@ -25,6 +25,6 @@ export class SelectComponent {
     public update(ev:Event){
         let sel = <HTMLSelectElement> ev.target, op = <HTMLOptionElement> sel.options[sel.selectedIndex];
         this.props['eq'][this.field.name] = (op.value === "") ? null : op.value;
-        this.filterChange.emit(null);
+        this.filterChange.emit(this.field);
     }
 }

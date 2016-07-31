@@ -2,6 +2,8 @@ import {EqField, IEq, isEq, Eq, IEqConfig, EqConfig, IEqProps, IField} from "./e
 
 export {EqField, IEq, isEq, Eq};
 
+export const __NULL_STRING__ = "__NULL__";
+
 export interface IFieldProperty {
     cardinality:number,
     dir?:TDirection,
@@ -33,10 +35,10 @@ export class Field extends EqField {
         let vals = [this.value(a), this.value(b)];
         if (vals[0] === null || vals[1] === null || vals[0] === vals[1]) {
             return null;
-        }else{
-            if(isOrd(vals[0])){
+        } else {
+            if (isOrd(vals[0])) {
                 return (this.dir == "ASC") ? (<IOrd> vals[0]).greater(<IOrd> vals[1]) : (<IOrd> vals[0]).less(<IOrd> vals[1]);
-            }else{
+            } else {
                 return (this.dir == "ASC") ? (vals[0] > vals[1]) : (vals[0] < vals[1]);
             }
         }
@@ -46,10 +48,10 @@ export class Field extends EqField {
         let vals = [this.value(a), this.value(b)];
         if (vals[0] === null || vals[1] === null || vals[0] === vals[1]) {
             return null;
-        }else{
-            if(isOrd(vals[0])){
+        } else {
+            if (isOrd(vals[0])) {
                 return (this.dir == "ASC") ? (<IOrd> vals[0]).less(b) : (<IOrd> vals[0]).greater(b);
-            }else{
+            } else {
                 return (this.dir == "ASC") ? (vals[0] < vals[1]) : (vals[0] > vals[1]);
             }
         }
@@ -76,30 +78,10 @@ export function isFieldOrd(object:any):object is Field {
     return ('name' in object && 'map' in object);
 }
 
-const
-    _impl = function (method:string) {
-        return function (a:IOrd, config?:IOrdConfig) {
-            if (!config) {
-                throw new Error("Method " + method + " cannot be run without config.");
-            }
-            for(let i = 0; i < config.ordFields.length; i++){
-                let val = config.ordFields[i][method](this, a);
-                if (val !== null) return val;
-            }
-            return null;
-        }
-    },
-    implGreater = function (target:Function) {
-        target.prototype.greater = _impl('greater');
-    },
-    implLess = function (target:Function) {
-        target.prototype.less = _impl('less');
-    }
-    ;
-
 export interface IOrdConfig extends IEqConfig {
     ordFields:Array<Field>
     eqFields:Array<EqField>
+    fields:Array<EqField>
 }
 
 export class OrdConfig extends EqConfig implements IOrdConfig {
@@ -132,13 +114,26 @@ export class Ord extends Eq {
 
     protected static _ord:{fields:Array<Field>} = {fields: []};
 
-    static implement(props?:IEqProps) {
-        return (target:Function) => {
-            Eq.implementFields((props) ? <IOrdConfig> props.config : null, Ord._ord.fields);
-            Ord._ord.fields = [];
-            implGreater(target);
-            implLess(target);
-            Eq.implement(props).apply(this, [target]);
+    protected static _impl(method:string){
+        return function (a:IOrd, config?:IOrdConfig) {
+            if (!config) {
+                throw new Error("Method " + method + " cannot be run without config.");
+            }
+            for (let field of config.ordFields) {
+                let val = field[method](this, a);
+                if (val !== null) return val;
+            }
+            return null;
+        }
+    }
+
+    static implement(props?:IEqProps){
+            return (target:Function) => {
+                Eq.implementFields((props) ? <IOrdConfig> props.config : null, Ord._ord.fields);
+                Ord._ord.fields = [];
+                target.prototype.greater = this._impl('greater');
+                target.prototype.less = this._impl('less');
+                Eq.implement(props).apply(this, [target]);
         }
     }
 
@@ -174,15 +169,16 @@ export class Ord extends Eq {
     }
 }
 
-const
-    _implAnd = function (method:string) {
-        return function (a:IOrd, config:IOrdConfig) {
+export class OrdAnd extends Ord {
+
+    protected static _impl(method:string): (a:IOrd, config?:IOrdConfig)=>(any|any) {
+        return function (a:IOrd, config?:IOrdConfig) {
             if (!config) {
                 throw new Error("Method " + method + " cannot be run without config.");
             }
             let res = null;
-            for(let i = 0; i < config.ordFields.length; i++) {
-                let val = config.ordFields[i][method](this, a);
+            for (let field of config.ordFields) {
+                let val = field[method](this, a);
                 if (val !== null) {
                     if (!val) return false;
                     res = true;
@@ -190,24 +186,86 @@ const
             }
             return res;
         }
-    },
-    implGreaterAnd = function (target:Function) {
-        target.prototype.greater = _implAnd('greater');
-    },
-    implLessAnd = function (target:Function) {
-        target.prototype.less = _implAnd('less');
     }
-    ;
+};
 
-export class OrdAnd extends Ord {
+export interface IRecord<T> {
+    record(fieldName:string, method:string, value:string, data?:Object):void;
+    play(fieldName:string, method:string, value:string):T
+    reset();
+}
 
-    static implement(props?:IEqProps) {
-        return (target:Function) => {
-            Eq.implementFields((props) ? <IOrdConfig> props.config : null, Ord._ord.fields);
-            Ord._ord.fields = [];
-            implGreaterAnd(target);
-            implLessAnd(target);
-            Eq.implement(props).apply(this, [target]);
+export abstract class AbstractRecord<T> implements IRecord<T> {
+
+    protected results:{}={};
+
+    protected initVal : T;
+
+    protected guarantee(obj:Object, key:string, value:any):this {
+        if (!(key in obj)) {
+            obj[key] = value;
+        }
+        return this;
+    }
+
+    protected abstract _record(fieldName:string, method:string, value:string, data?:Object);
+
+    public play(fieldName:string, method:string, value:string):T {
+        this.guarantee(this.results, fieldName, {})
+            .guarantee(this.results[fieldName], method, {})
+            .guarantee(this.results[fieldName][method], value, this.initVal);
+        return this.results[fieldName][method][value];
+    }
+
+    public record(fieldName:string, method:string, value:string, data?:Object) {
+        this.guarantee(this.results, fieldName, {})
+            .guarantee(this.results[fieldName], method, {})
+            .guarantee(this.results[fieldName][method], value, this.initVal);
+        this._record(fieldName, method, value, data);
+    }
+
+    public reset() {
+        this.results = {};
+    }
+}
+
+export class CountRecord extends AbstractRecord<number>{
+
+    protected initVal : number = 0;
+
+    protected _record(fieldName:string, method:string, value:string, data?:Object) {
+        this.results[fieldName][method][value]++;
+    }
+
+    recordOrdConfig(cs:IOrd[],config:IOrdConfig){
+        cs.forEach((c:IOrd) => {config.fields.forEach( (field) => this.record(field.name,"eq",c[field.name]))});
+    }
+}
+
+export class BorderRecord extends AbstractRecord<number>{
+
+    protected initVal : number = 0;
+
+    protected _record(fieldName:string, method:string, value:string, data?:Object) {
+        this.results[fieldName][method]['min'] = ('min' in this.results[fieldName][method])
+            ? Math.min(this.results[fieldName][method]['min'], parseFloat(value))
+            : parseFloat(value);
+        this.results[fieldName][method]['max'] = ('max' in this.results[fieldName][method])
+            ? Math.max(this.results[fieldName][method]['max'], parseFloat(value))
+            : parseFloat(value);
+    }
+
+    public record(fieldName:string, method:string, value:string, data?:Object) {
+        this.guarantee(this.results,fieldName, {})
+            .guarantee(this.results[fieldName], method, {});
+        this._record(fieldName, method, value, data);
+    }
+
+    public recordOrdConfig(cs:IOrd[],config:IOrdConfig){
+        for(let c of cs){
+            for(let field of config.fields){
+                this.record(field.name,"eq",c[field.name]);
+            }
         }
     }
 }

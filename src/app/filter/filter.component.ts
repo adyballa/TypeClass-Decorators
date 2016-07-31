@@ -1,7 +1,7 @@
-import {Component, Output, EventEmitter} from '@angular/core';
-import {Ord, isFieldOrd, IOrd, IOrdConfig} from "../decorators/ord.typeclass";
+import {Component, Output, EventEmitter, ViewChildren, QueryList, AfterViewChecked} from '@angular/core';
+import {Ord, isFieldOrd, IOrd, IOrdConfig, CountRecord, BorderRecord} from "../decorators/ord.typeclass";
 import {ListModelService} from "../cars/listModel.service";
-import {EqField, EqOr} from "../decorators/eq.typeclass";
+import {EqField, EqOr, IField} from "../decorators/eq.typeclass";
 import {RangeComponent} from "./range/range.component";
 import {SelectRangeComponent} from "./selectRange/selectRange.component";
 import {SelectComponent} from "./select/select.component";
@@ -10,6 +10,8 @@ import {DateRangeComponent} from "./date-range/date-range.component";
 import {DateComponent} from "./date/date.component";
 import {OrdlocationComponent} from "./ordlocation/ordlocation.component";
 import {TextComponent} from "./text/text.component";
+import * as _ from 'lodash';
+import {History} from "../class/history";
 
 export interface FilterProperty{
     [name:string] : (string|number|Array<string|number>)
@@ -19,6 +21,22 @@ export interface FilterProperties{
     bottom:FilterProperty,
     eq:FilterProperty
 }
+export interface IReCount{
+    countRecord:CountRecord,
+    props:FilterProperties
+}
+export interface IReBorder{
+    borderRecord:BorderRecord,
+    props:FilterProperties
+}
+export interface ICounterField {
+    setCount():void
+}
+export interface IBorderField {
+    setBorder(fInit?:boolean):void
+}
+
+export type TFilterPropertyKeys = 'top'|'bottom'|'eq';
 
 @Component({
     moduleId: module.id,
@@ -28,9 +46,9 @@ export interface FilterProperties{
     directives: [ RangeComponent, SelectRangeComponent, SelectComponent, CheckboxComponent,
         DateRangeComponent, DateComponent, OrdlocationComponent, TextComponent ]
 })
-export class FilterComponent {
+export class FilterComponent implements AfterViewChecked{
     @Output()
-    public filtered:EventEmitter<any> = new EventEmitter(true);
+    public filtered:EventEmitter<any> = new EventEmitter(false);
 
     public props:FilterProperties = {top:{},bottom:{},eq:{}};
 
@@ -40,13 +58,51 @@ export class FilterComponent {
 
     private _config:IOrdConfig;
 
+    private _history:History<IField>;
+
+    private _viewCheckedCounter : number = 0;
+
+    @ViewChildren('counter')
+    private counter : QueryList<ICounterField>;
+
+    @ViewChildren('border')
+    private border : QueryList<IBorderField>;
+
     constructor(private listService:ListModelService) {
         this.fields = this.listService.fields;
         this._model = this.listService.getModel();
-        this._config = this.listService.getConfig();
+        this._config = _.cloneDeep(this.listService.getConfig());
+        this._history = new History<IField>(10);
     }
 
-    public filter() {
+    ngAfterViewChecked():any {
+        if(this._viewCheckedCounter === 1){
+            this.counter.forEach((filter) => filter.setCount());
+            this.border.forEach((filter) => filter.setBorder(true));
+        }
+        this._viewCheckedCounter++;
+    }
+
+    public get countRecord() : CountRecord{
+        return this.listService.countRecord;
+    }
+
+    public get borderRecord() : BorderRecord{
+        return this.listService.borderRecord;
+    }
+
+    public reCount(event:IReCount){
+        const res = <IOrd[]>EqOr.fuzzyEq(this.listService.list, this.listService.createItems(event.props.eq), this._config);
+        event.countRecord.recordOrdConfig(res, this._config);
+    }
+
+    public reBorder(event:IReBorder){
+        const res = <IOrd[]>EqOr.fuzzyEq(this.listService.list, this.listService.createItems(event.props.eq), this._config);
+        event.borderRecord.recordOrdConfig(res, this._config);
+    }
+
+    public filter(field : IField) {
+        this._history.unshift(field);
         let top = this.listService.createAndItem(this.props.top),
             bottom = this.listService.createAndItem(this.props.bottom),
             eqs = this.listService.createItems(this.props.eq),
@@ -60,6 +116,8 @@ export class FilterComponent {
         }
         this.listService.result = res;
         this.filtered.emit({});
+        this.counter.forEach((filter) => filter.setCount());
+        this.border.forEach((filter) => filter.setBorder());
     }
 
     public createField(field:EqField):string {

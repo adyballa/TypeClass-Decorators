@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {IOrd, IOrdConfig} from "../decorators/ord.typeclass";
+import {IOrd, IOrdConfig, CountRecord, BorderRecord} from "../decorators/ord.typeclass";
 import {AbstractListModelService} from "./abstractListModel.service";
 import {Car, CarAnd, Colors, Brands, Interiors, carConfig} from '../class/car';
 import {OrdLocation} from "../class/ordLocation";
@@ -8,6 +8,18 @@ import {OrdLocation} from "../class/ordLocation";
 export class ListModelService extends AbstractListModelService {
 
     protected _config : IOrdConfig = carConfig;
+
+    private _countRecord : CountRecord = new CountRecord();
+
+    private _borderRecord : BorderRecord = new BorderRecord();
+
+    public get borderRecord(){
+        return this._borderRecord;
+    }
+
+    public get countRecord(){
+        return this._countRecord;
+    }
 
     public createItem(props:any = {}):IOrd {
         let {engine = null, color = null, brand = null, interior = null, date = null, location = null, name = null} = props;

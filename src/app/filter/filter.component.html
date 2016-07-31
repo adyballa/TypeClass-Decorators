@@ -3,35 +3,35 @@
     <ul class="items">
         <li *ngFor="let field of fields" [ngSwitch]="createField(field)">
             <template ngSwitchCase="number">
-                <field-range (filterChange)="filter()" [field]="field" [props]="props"></field-range>
+                <field-range #border (borderChange)="reBorder($event)" [_history]="_history" [borderRecord]="borderRecord" (filterChange)="filter($event)" [field]="field" [props]="props"></field-range>
             </template>
             <template ngSwitchCase="select">
                 <div [ngSwitch]="field.name">
                     <template ngSwitchCase="brand">
-                        <field-checkbox (filterChange)="filter()" [field]="field" [props]="props"
-                                        [options]="getOptions(field.name)"></field-checkbox>
+                        <field-checkbox #counter (filterChange)="filter($event)" [field]="field" [props]="props" (counterChange)="reCount($event)"
+                                        [options]="getOptions(field.name)" [countRecord]="countRecord" [_history]="_history"></field-checkbox>
                     </template>
                     <template ngSwitchDefault>
-                        <field-range-select (filterChange)="filter()" [field]="field"
-                                            [props]="props"></field-range-select>
+                        <field-range-select #counter (filterChange)="filter($event)" [field]="field" [props]="props" (counterChange)="reCount($event)"
+                                        [countRecord]="countRecord" [_history]="_history"></field-range-select>
                     </template>
                 </div>
             </template>
             <template ngSwitchCase="string-options">
-                <field-checkbox (filterChange)="filter()" [field]="field" [props]="props"
-                                [options]="getOptions(field.name)"></field-checkbox>
+                <field-checkbox #counter (filterChange)="filter($event)" [field]="field" [props]="props" (counterChange)="reCount($event)"
+                                [options]="getOptions(field.name)" [countRecord]="countRecord" [_history]="_history"></field-checkbox>
             </template>
             <template ngSwitchCase="string">
-                <field-text (filterChange)="filter()" [field]="field" [props]="props"></field-text>
+                <field-text (filterChange)="filter($event)" [field]="field" [props]="props" [_history]="_history"></field-text>
             </template>
             <template ngSwitchCase="date">
-                <field-date (filterChange)="filter()" [field]="field" [props]="props" [options]="getOptions(field.name)"></field-date>
+                <field-date (filterChange)="filter($event)" [field]="field" [props]="props" [options]="getOptions(field.name)"></field-date>
             </template>
             <template ngSwitchCase="ordlocation">
-                <field-ordlocation (filterChange)="filter()" [field]="field" [props]="props" [options]="getOptions(field.name)"></field-ordlocation>
+                <field-ordlocation (filterChange)="filter($event)" [field]="field" [props]="props" [options]="getOptions(field.name)"></field-ordlocation>
             </template>
             <template ngSwitchCase="date-range">
-                <field-date-range (filterChange)="filter()" [field]="field" [props]="props"></field-date-range>
+                <field-date-range (filterChange)="filter($event)" [field]="field" [props]="props"></field-date-range>
             </template>
         </li>
     </ul>

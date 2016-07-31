@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {ListModelService} from './listModel.service';
-import {Ord, IOrd, IOrdConfig, Field} from '../decorators/ord.typeclass';
+import {Ord, IOrd, IOrdConfig} from '../decorators/ord.typeclass';
 import {FilterComponent} from "../filter/filter.component";
 import {Car} from "../class/car";
 import {SortComponent} from "../filter/sort/sort.component";
@@ -30,7 +30,7 @@ export class CarsComponent implements OnInit {
     }
 
     ngOnInit():any {
-        this.calculate();
+        //this.calculate();
     }
 
     public fieldChange(){
@@ -38,7 +38,9 @@ export class CarsComponent implements OnInit {
     }
 
     public calculate(){
+        this.listService.countRecord.reset();
         this._result  = <Car[]> Ord.sort(this.listService.result, this._config);
+        this.listService.countRecord.recordOrdConfig(this._result, this._config);
     }
 
     public get config() : IOrdConfig {

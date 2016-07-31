@@ -1,5 +1,6 @@
 import {Component, Output, Input, EventEmitter } from '@angular/core';
 import {Field} from "../../decorators/ord.typeclass";
+import {IField} from "../../decorators/eq.typeclass";
 
 @Component({
   moduleId: module.id,
@@ -10,7 +11,7 @@ import {Field} from "../../decorators/ord.typeclass";
 export class DateRangeComponent {
 
   @Output()
-  public filterChange : EventEmitter<any> = new EventEmitter();
+  public filterChange : EventEmitter<IField> = new EventEmitter<IField>();
 
   @Input()
   public field:Field;
@@ -19,6 +20,6 @@ export class DateRangeComponent {
   public props:Object;
 
   public update(){
-    this.filterChange.emit(this.props);
+    this.filterChange.emit(this.field);
   }
 }
