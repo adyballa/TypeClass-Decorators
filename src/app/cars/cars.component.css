@@ -31,7 +31,6 @@ span.cell{
 {
   border-top-width: 2px;
 }
-
-ul.result-list{
-  list-style: none;
+.contentbox{
+  background: #92a9ff;
 }

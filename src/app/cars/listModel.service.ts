@@ -61,8 +61,8 @@ export class ListModelService extends AbstractListModelService {
         return text;
     }
 
-    protected getList():Promise<IOrd[]> {
-        let cars = new Array(3500);
+    protected getList(limit?:number):Promise<IOrd[]> {
+        let cars = new Array( (limit === null) ? 3500 : limit);
 
         for (let i = 0; i < cars.length; i++) {
             cars[i] = {

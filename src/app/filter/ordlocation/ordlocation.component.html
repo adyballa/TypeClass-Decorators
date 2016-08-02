@@ -1,6 +1,28 @@
-<div>
-  Umkreissuche?:<input type="checkbox" name="{{ field.name }}_null" [(ngModel)]="isActive"  />
-  X: <input type="number" [disabled]="!isActive" [(ngModel)]="_location.x" name="{{ field.name }}_x" (change)="update()" />
-  Y: <input type="number" [disabled]="!isActive" [(ngModel)]="_location.y" name="{{ field.name }}_y" (change)="update()" />
-  Distanz: <input type="number" [disabled]="!isActive" [(ngModel)]="distance" name="{{ field.name }}_distance" (change)="update()" />
+<div class="form-group row">
+    <label class="col-xs-4 col-form-label" attr.id="{{field.name}}-{{moduleId}}-null">Umkreissuche?:</label>
+    <div class="col-xs-8">
+        <input id="{{field.name}}-{{moduleId}}-null" type="checkbox" name="{{ field.name }}_null"
+               [(ngModel)]="isActive"/>
+    </div>
+</div>
+<div class="form-group row">
+    <label class="col-xs-4 col-form-label" attr.for="{{field.name}}-{{moduleId}}-x">X:</label>
+    <div class="col-xs-8">
+        <input class="form-control" id="{{field.name}}-{{moduleId}}-x" type="number" [disabled]="!isActive"
+               [(ngModel)]="_location.x" name="{{ field.name }}_x" (change)="update()"/>
+    </div>
+</div>
+<div class="form-group row">
+    <label class="col-xs-4 col-form-label" attr.for="{{field.name}}-{{moduleId}}-y">Y:</label>
+    <div class="col-xs-8">
+        <input class="form-control" id="{{field.name}}-{{moduleId}}-y" type="number" [disabled]="!isActive"
+               [(ngModel)]="_location.y" name="{{ field.name }}_y" (change)="update()"/>
+    </div>
+</div>
+<div class="form-group row">
+    <label class="col-xs-4 col-form-label" attr.for="{{field.name}}-{{moduleId}}-distance">Distanz:</label>
+    <div class="col-xs-8">
+        <input class="form-control" id="{{field.name}}-{{moduleId}}-distance" type="number" [disabled]="!isActive"
+               [(ngModel)]="distance" name="{{ field.name }}_distance" (change)="update()"/>
+    </div>
 </div>

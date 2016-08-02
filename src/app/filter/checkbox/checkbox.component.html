@@ -1,5 +1,10 @@
-<label>{{ field.name }}:</label>
-<span *ngFor="let val of options">
-    {{ val }}<input #inps type="checkbox" name="filter-checkbox-{{ field.name }}" value="{{ val }}" (change)="update($event)" />
-    <span class="counter">[{{ _count[val]|async }}]</span>
-</span>
+<div class="form-group row">
+    <label class="col-xs-4 col-form-label">{{ field.name }}:</label>
+    <div class="col-xs-8">
+        <div *ngFor="let val of options">
+            {{ val }}<input #inps type="checkbox" name="filter-checkbox-{{ field.name }}" value="{{ val }}"
+                            (change)="update($event)" id="{{field.name}}-{{moduleId}}-{{val}}"/>
+            <span class="counter">[{{ _count[val]|async }}]</span>
+        </div>
+    </div>
+</div>

@@ -1,20 +1,31 @@
-<div class="filter">
+<section class="listlength col-sm-12">
+    <list-length [length]="_limit"></list-length>
+</section>
+<section class="filter col-sm-4">
     <my-filter (filtered)="calculate()"></my-filter>
-</div>
-<div class="content">
+</section>
+<section class="col-sm-8 contentbox box">
     <h3>all cars</h3>
     <table cellpadding="0" cellspacing="0" class="result-list">
         <thead>
-            <tr>
-                <td class="cell head" *ngFor="let field of (config.eqFields); let i = index">{{ field.name }}</td>
-                <td class="cell head" *ngFor="let field of (config.ordFields); let i = index"><field-sort [cardinality]="i" [field]="field" [ordFields]="config.ordFields" (fieldChange)="fieldChange()"></field-sort></td>
-            </tr>
+        <tr>
+            <td class="cell head" *ngFor="let field of (config.eqFields); let i = index">{{ field.name }}</td>
+            <td class="cell head" *ngFor="let field of (config.ordFields); let i = index">
+                <field-sort [cardinality]="i" [field]="field" [ordFields]="config.ordFields"
+                            (fieldChange)="fieldChange()"></field-sort>
+            </td>
+        </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let car of result">
-                <td *ngFor="let field of (config.eqFields)" class="cell cell-{{field.name}}-{{car[field.name]}}">{{car[field.name]}}</td>
-                <td *ngFor="let field of (config.ordFields)" class="cell cell-{{field.name}}-{{car[field.name]}}">{{car[field.name]}}</td>
-            </tr>
+        <tr *ngFor="let car of result">
+            <td *ngFor="let field of (config.eqFields)" class="cell cell-{{field.name}}-{{car[field.name]}}">
+                {{car[field.name]}}
+            </td>
+            <td *ngFor="let field of (config.ordFields)" class="cell cell-{{field.name}}-{{car[field.name]}}">
+                {{car[field.name]}}
+            </td>
+        </tr>
         </tbody>
     </table>
-</div>
+
+</section>

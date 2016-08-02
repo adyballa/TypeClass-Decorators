@@ -1,4 +1,4 @@
-<section class="filterbox">
+<div class="filterbox box">
     <h3>Filter</h3>
     <ul class="items">
         <li *ngFor="let field of fields" [ngSwitch]="createField(field)">
@@ -35,4 +35,4 @@
             </template>
         </li>
     </ul>
-</section>
+</div>

@@ -1,5 +1,9 @@
-<label>{{ field.name }}:</label>
-<select id="{{ field.name }}" name="{{ field.name }}" (change)="update($event)" >
-    <option value="">bitte wählen</option>
-    <option *ngFor="let val of options">{{ val }}</option>
-</select>
+<div class="form-group row">
+    <label class="col-xs-4 col-form-label" attr.for="{{field.name}}-{{moduleId}}">{{ field.name }}:</label>
+    <div class="col-xs-8">
+        <select class="form-control" id="{{field.name}}-{{moduleId}}" name="{{ field.name }}" (change)="update($event)">
+            <option value="">bitte wählen</option>
+            <option *ngFor="let val of options">{{ val }}</option>
+        </select>
+    </div>
+</div>

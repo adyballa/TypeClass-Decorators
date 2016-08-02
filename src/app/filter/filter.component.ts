@@ -13,19 +13,19 @@ import {TextComponent} from "./text/text.component";
 import * as _ from 'lodash';
 import {History} from "../class/history";
 
-export interface FilterProperty{
-    [name:string] : (string|number|Array<string|number>)
+export interface FilterProperty {
+    [name:string]:(string|number|Array<string|number>)
 }
-export interface FilterProperties{
+export interface FilterProperties {
     top:FilterProperty,
     bottom:FilterProperty,
     eq:FilterProperty
 }
-export interface IReCount{
+export interface IReCount {
     countRecord:CountRecord,
     props:FilterProperties
 }
-export interface IReBorder{
+export interface IReBorder {
     borderRecord:BorderRecord,
     props:FilterProperties
 }
@@ -43,14 +43,14 @@ export type TFilterPropertyKeys = 'top'|'bottom'|'eq';
     selector: 'my-filter',
     templateUrl: 'filter.component.html',
     styleUrls: ['filter.component.css'],
-    directives: [ RangeComponent, SelectRangeComponent, SelectComponent, CheckboxComponent,
-        DateRangeComponent, DateComponent, OrdlocationComponent, TextComponent ]
+    directives: [RangeComponent, SelectRangeComponent, SelectComponent, CheckboxComponent,
+        DateRangeComponent, DateComponent, OrdlocationComponent, TextComponent]
 })
-export class FilterComponent implements AfterViewChecked{
+export class FilterComponent implements AfterViewChecked {
     @Output()
     public filtered:EventEmitter<any> = new EventEmitter(false);
 
-    public props:FilterProperties = {top:{},bottom:{},eq:{}};
+    public props:FilterProperties = {top: {}, bottom: {}, eq: {}};
 
     public fields:EqField[];
 
@@ -60,61 +60,69 @@ export class FilterComponent implements AfterViewChecked{
 
     private _history:History<IField>;
 
-    private _viewCheckedCounter : number = 0;
+    private _viewCheckedCounter:number = 0;
 
     @ViewChildren('counter')
-    private counter : QueryList<ICounterField>;
+    private counter:QueryList<ICounterField>;
 
     @ViewChildren('border')
-    private border : QueryList<IBorderField>;
+    private border:QueryList<IBorderField>;
 
     constructor(private listService:ListModelService) {
         this.fields = this.listService.fields;
         this._model = this.listService.getModel();
         this._config = _.cloneDeep(this.listService.getConfig());
-        this._history = new History<IField>(10);
+        this._history = new History<IField>(2);
     }
 
+    /**
+     * @FIXME Initialisierung kann erst ab dem 2.ten Durchlauf gemacht werden.
+     */
     ngAfterViewChecked():any {
-        if(this._viewCheckedCounter === 1){
+        if (this._viewCheckedCounter === 1) {
             this.counter.forEach((filter) => filter.setCount());
             this.border.forEach((filter) => filter.setBorder(true));
         }
         this._viewCheckedCounter++;
     }
 
-    public get countRecord() : CountRecord{
+    public set viewCheckedCounter(counter){
+        this._viewCheckedCounter = counter;
+    }
+
+    public get countRecord():CountRecord {
         return this.listService.countRecord;
     }
 
-    public get borderRecord() : BorderRecord{
+    public get borderRecord():BorderRecord {
         return this.listService.borderRecord;
     }
 
-    public reCount(event:IReCount){
-        const res = <IOrd[]>EqOr.fuzzyEq(this.listService.list, this.listService.createItems(event.props.eq), this._config);
-        event.countRecord.recordOrdConfig(res, this._config);
+    public reCount(event:IReCount) {
+        event.countRecord.recordOrdConfig(this._filter(this.listService.list, event.props), this._config);
     }
 
-    public reBorder(event:IReBorder){
-        const res = <IOrd[]>EqOr.fuzzyEq(this.listService.list, this.listService.createItems(event.props.eq), this._config);
-        event.borderRecord.recordOrdConfig(res, this._config);
+    public reBorder(event:IReBorder) {
+        event.borderRecord.recordOrdConfig(this._filter(this.listService.list, event.props), this._config);
     }
 
-    public filter(field : IField) {
-        this._history.unshift(field);
-        let top = this.listService.createAndItem(this.props.top),
-            bottom = this.listService.createAndItem(this.props.bottom),
-            eqs = this.listService.createItems(this.props.eq),
-            res = this.listService.list
+    private _filter(cs:IOrd[], props:FilterProperties):IOrd[] {
+        let top = this.listService.createAndItem(props.top),
+            bottom = this.listService.createAndItem(props.bottom),
+            eqs = this.listService.createItems(props.eq)
             ;
-        if(Object.keys(this.props.eq).length>0){
-            res = <IOrd[]>EqOr.fuzzyEq(res, eqs, this._config);
+        if (Object.keys(props.eq).length > 0) {
+            cs = <IOrd[]>EqOr.fuzzyEq(cs, eqs, this._config);
         }
-        if(Object.keys(this.props.top).length>0 || Object.keys(this.props.bottom).length>0){
-            res = Ord.inRange(res, top, bottom, this._config);
+        if (Object.keys(props.top).length > 0 || Object.keys(props.bottom).length > 0) {
+            cs = Ord.inRange(cs, top, bottom, this._config);
         }
-        this.listService.result = res;
+        return cs;
+    }
+
+    public filter(field:IField) {
+        this._history.unshift(field);
+        this.listService.result = this._filter(this.listService.list, this.props);
         this.filtered.emit({});
         this.counter.forEach((filter) => filter.setCount());
         this.border.forEach((filter) => filter.setBorder());
@@ -124,16 +132,16 @@ export class FilterComponent implements AfterViewChecked{
         if (isFieldOrd(field) && field.map.length > 0) {
             return "select";
         }
-        if(this._model[field.name] instanceof Date){
+        if (this._model[field.name] instanceof Date) {
             return (isFieldOrd(field)) ? "date-range" : "date";
         }
-        if(typeof this._model[field.name] === "object"){
+        if (typeof this._model[field.name] === "object") {
             let m = /function (.*)\(.*/g.exec(this._model[field.name].constructor);
-            if(m.length===2){
+            if (m.length === 2) {
                 return m[1].toLowerCase();
             }
-        }else{
-            switch(typeof this._model[field.name]){
+        } else {
+            switch (typeof this._model[field.name]) {
                 case "string":
                     return (this.getOptions(field.name)) ? "string-options" : "string";
                 case "number":
@@ -142,7 +150,7 @@ export class FilterComponent implements AfterViewChecked{
         }
     }
 
-    public getOptions(name:string) : Array<string> {
+    public getOptions(name:string):Array<string> {
         return this.listService.getOptions(name);
     }
 }

@@ -72,5 +72,12 @@ export abstract class AbstractListModelService{
         return res;
     }
 
-    protected abstract getList() : Promise<IOrd[]>;
+    public setList(limit?:number) : Promise<void>{
+        return this.getList(limit).then((list : IOrd[]) => {
+            this._list = list.slice(0);
+            this.result = list;
+        });
+    }
+
+    protected abstract getList(limit?:number) : Promise<IOrd[]>;
 }

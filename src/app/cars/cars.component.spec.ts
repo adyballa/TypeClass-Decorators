@@ -11,10 +11,22 @@ import {
 } from '@angular/core/testing';
 
 import { CarsComponent } from './cars.component';
+import {ActivatedRoute} from "@angular/router";
+import {TestComponentBuilder} from '@angular/compiler/testing';
+
+class MockActivatedRoute {}
 
 describe('Component: Cars', () => {
+
+  beforeEachProviders(() => [
+    {provide: ActivatedRoute, useClass: MockActivatedRoute}
+  ]);
   it('should create an instance', () => {
-    let component = new CarsComponent(new ListModelService());
-    expect(component).toBeTruthy();
+    inject([TestComponentBuilder, ActivatedRoute], (tcb:TestComponentBuilder, ar: MockActivatedRoute) => {
+      tcb.createAsync(CarsComponent).then((fixture) => {
+        expect(fixture.componentInstance instanceof CarsComponent).toBe(true, 'should create CarsComponent');
+        console.log(ar);
+      });
+    });
   });
 });

@@ -1,0 +1,16 @@
+html,body{
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-size: 12px;
+}
+.box{
+  margin: 2em 0;
+  padding: 1em;
+  background: #f0f0f0;
+}
+ul.items label{
+  text-align: right;
+}
+h3{
+  margin: 1rem 0;
+  font-size: 2rem;
+}

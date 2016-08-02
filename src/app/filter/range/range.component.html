@@ -1,6 +1,16 @@
-<div>
-    {{ field.name }} von: <input type="range" min="{{_border.min|async}}" max="{{_border.max|async}}" name="{{ field.name }}_bottom"
-                                 bindon-ngModel="props.bottom[field.name]" (change)="update()" />
-    {{ field.name }} bis: <input type="range" min="{{_border.min|async}}" max="{{_border.max|async}}" name="{{ field.name }}_top"
-                                 bindon-ngModel="props.top[field.name]" (change)="update()" value="{{_value|async}}" />
+<div class="form-group row">
+    <label class="col-xs-4 col-form-label" attr.for="{{field.name}}-{{moduleId}}-bottom">{{ field.name }} von:<span>[{{_border.min|async}}]</span></label>
+    <div class="col-xs-8">
+        <input type="range" min="{{_border.min|async}}" max="{{_border.max|async}}" name="{{ field.name }}_bottom"
+               class="form-control" id="{{field.name}}-{{moduleId}}-bottom" bindon-ngModel="props.bottom[field.name]"
+               (change)="update()"/>
+    </div>
+</div>
+<div class="form-group row">
+    <label class="col-xs-4 col-form-label" attr.for="{{field.name}}-{{moduleId}}-top">{{ field.name }} bis:<span>[{{_border.max|async}}]</span></label>
+    <div class="col-xs-8">
+        <input type="range" min="{{_border.min|async}}" max="{{_border.max|async}}" name="{{ field.name }}_top"
+               class="form-control" id="{{field.name}}-{{moduleId}}-top" bindon-ngModel="props.top[field.name]"
+               (change)="update()" value="{{_value|async}}"/>
+    </div>
 </div>

@@ -1,9 +1,15 @@
-<h1>
-    {{title}}
-</h1>
-<nav>
-    <my-main-navigation></my-main-navigation>
-</nav>
-<div class="content">
+<div class="container-fluid">
+    <section class="col-sm-8">
+        <div class="headbox box">
+            <h1>
+                {{title}}
+            </h1>
+            <nav>
+                <my-main-navigation></my-main-navigation>
+            </nav>
+        </div>
+    </section>
+</div>
+<div class="container-fluid contentbox">
     <router-outlet></router-outlet>
 </div>

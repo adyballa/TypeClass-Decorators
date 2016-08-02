@@ -35,6 +35,7 @@ const barrels: string[] = [
   'app',
   'app/shared',
   'app/filter/ordlocation',
+  'app/list-length',
   /** @cli-barrel */
 ];
 
