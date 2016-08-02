@@ -1,0 +1,7 @@
+<div class="form-inline box list-length-box col-xs-4">
+  <div class="form-group">
+    <label class="col-form-label" attr.for="{{moduleId}}-list-length">How many cars:</label>
+      <input class="form-control" type="text" [(ngModel)]="length" id="{{moduleId}}-list-length"
+             name="{{moduleId}}-list-length" (keyup)="update()"/>
+  </div>
+</div>
