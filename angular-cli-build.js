@@ -16,7 +16,9 @@ module.exports = function(defaults) {
       'reflect-metadata/**/*.+(ts|js|js.map)',
       'rxjs/**/*.+(js|js.map)',
       '@angular/**/*.+(js|js.map)',
-      'lodash/*.+(js|js.map)'
+      'lodash/*.+(js|js.map)',
+      'decorator-ord/dist/*.+(js|js.map)',
+      'decorator-ord/dist/node_modules/**/*.+(js|js.map)'
     ]
   });
 };

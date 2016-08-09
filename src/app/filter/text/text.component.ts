@@ -1,6 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {Field} from "../../decorators/ord.typeclass";
-import {IField} from "../../decorators/eq.typeclass";
+import {Field,IField} from "decorator-ord";
 
 @Component({
   moduleId: module.id,

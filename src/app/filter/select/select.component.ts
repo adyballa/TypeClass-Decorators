@@ -1,5 +1,5 @@
 import {Component, Input, Output, EventEmitter} from '@angular/core';
-import {EqField, IField} from "../../decorators/eq.typeclass";
+import {EqField,IField} from "decorator-ord";
 import {FilterProperties} from "../filter.component";
 
 @Component({

@@ -1,5 +1,4 @@
-import {IOrd, IOrdConfig} from "../decorators/ord.typeclass";
-import {IEqConfig, IEq} from "../decorators/eq.typeclass";
+import {IOrd, IOrdConfig, IEqConfig, IEq} from "decorator-ord";
 /**
  * Created by Andreas on 26.07.2016.
  */

@@ -1,7 +1,16 @@
 import {Component, Output, EventEmitter, ViewChildren, QueryList, AfterViewChecked} from '@angular/core';
-import {Ord, isFieldOrd, IOrd, IOrdConfig, CountRecord, BorderRecord} from "../decorators/ord.typeclass";
+import {
+    Ord,
+    EqField,
+    EqOr,
+    isFieldOrd,
+    IOrd,
+    IOrdConfig,
+    IField,
+    CountRecord,
+    BorderRecord
+} from "decorator-ord";
 import {ListModelService} from "../cars/listModel.service";
-import {EqField, EqOr, IField} from "../decorators/eq.typeclass";
 import {RangeComponent} from "./range/range.component";
 import {SelectRangeComponent} from "./selectRange/selectRange.component";
 import {SelectComponent} from "./select/select.component";
@@ -10,7 +19,6 @@ import {DateRangeComponent} from "./date-range/date-range.component";
 import {DateComponent} from "./date/date.component";
 import {OrdlocationComponent} from "./ordlocation/ordlocation.component";
 import {TextComponent} from "./text/text.component";
-import * as _ from 'lodash';
 import {History} from "../class/history";
 
 export interface FilterProperty {
@@ -71,7 +79,7 @@ export class FilterComponent implements AfterViewChecked {
     constructor(private listService:ListModelService) {
         this.fields = this.listService.fields;
         this._model = this.listService.getModel();
-        this._config = _.cloneDeep(this.listService.getConfig());
+        this._config = <IOrdConfig> this.listService.getConfig().clone();
         this._history = new History<IField>(2);
     }
 
@@ -86,7 +94,7 @@ export class FilterComponent implements AfterViewChecked {
         this._viewCheckedCounter++;
     }
 
-    public set viewCheckedCounter(counter){
+    public set viewCheckedCounter(counter) {
         this._viewCheckedCounter = counter;
     }
 

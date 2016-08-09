@@ -4,4 +4,4 @@ function __export(m) {
 }
 __export(require('./environment'));
 __export(require('./app.component'));
-//# sourceMappingURL=index.js.map
+__export(require('./app.routes'));

@@ -1,6 +1,5 @@
 import {Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef, AfterViewInit} from '@angular/core';
-import {EqField, EqConfig, IField} from "../../decorators/eq.typeclass";
-import {Field as OrdField, isFieldOrd, TDirection, IOrdConfig} from "../../decorators/ord.typeclass";
+import {Field as OrdField, isFieldOrd, TDirection, EqField, OrdConfig} from "decorator-ord";
 import {ListModelService} from "../../cars/listModel.service";
 
 @Component({
@@ -39,7 +38,7 @@ export class SortComponent implements OnInit, AfterViewInit {
     }
 
     public sort(event:Event, fieldName:string) {
-        EqConfig.setCardinalityOfField(fieldName, this.ordFields);
+        OrdConfig.setOrdinalityOfField(fieldName, this.ordFields);
         this.fieldChange.emit(null);
     }
 

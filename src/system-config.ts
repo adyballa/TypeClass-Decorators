@@ -7,11 +7,27 @@
  **********************************************************************************************/
 /** Map relative paths to URLs. */
 const map: any = {
-  'lodash': 'vendor/lodash/lodash.js'
+  'lodash': 'vendor/lodash/lodash.js',
+  'decorator-ord': 'vendor/decorator-ord/dist',
+  'decorator-eq': 'vendor/decorator-ord/dist/node_modules/decorator-eq',
 };
 
 /** User packages configuration. */
 const packages: any = {
+  './vendor/decorator-ord/dist/node_modules/decorator-eq':{
+    main: 'index.js',
+    defaultExtension: 'js',
+    map:{
+      'decorator-eq': 'vendor/decorator-ord/dist/node_modules/decorator-eq'
+    }
+  },
+  './vendor/decorator-ord/dist':{
+    main: 'index.js',
+    defaultExtension: 'js',
+    map:{
+      'decorator-ord': 'vendor/decorator-ord/dist'
+    }
+  }
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////

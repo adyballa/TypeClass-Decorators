@@ -1,6 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {Field, BorderRecord} from "../../decorators/ord.typeclass";
-import {IField} from "../../decorators/eq.typeclass";
+import {Field,BorderRecord,IField} from "decorator-ord";
 import {History} from "../../class/history";
 import {BehaviorSubject} from "rxjs/Rx";
 import {AsyncPipe} from "@angular/common";

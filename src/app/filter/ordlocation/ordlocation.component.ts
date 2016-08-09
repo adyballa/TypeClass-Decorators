@@ -1,5 +1,5 @@
 import {Component, Output, Input, EventEmitter, OnInit} from '@angular/core';
-import {Field} from "../../decorators/ord.typeclass";
+import {Field} from "decorator-ord";
 import {OrdLocation} from "../../class/ordLocation";
 
 @Component({

@@ -21,6 +21,7 @@
     "@angular/platform-browser": "2.0.0-rc.3",
     "@angular/platform-browser-dynamic": "2.0.0-rc.3",
     "@angular/router": "3.0.0-alpha.7",
+    "decorator-ord": "git://github.com/adyballa/decorator-ord.git",
     "es6-shim": "0.35.1",
     "lodash": "^4.14.0",
     "reflect-metadata": "0.1.3",

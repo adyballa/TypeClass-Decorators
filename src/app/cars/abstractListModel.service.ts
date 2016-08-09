@@ -1,5 +1,4 @@
-import {IOrd, IOrdConfig, OrdConfig} from "../decorators/ord.typeclass";
-import {EqField} from "../decorators/eq.typeclass";
+import {OrdConfig, IOrdConfig, IOrd, EqField} from "decorator-ord";
 
 export abstract class AbstractListModelService{
 

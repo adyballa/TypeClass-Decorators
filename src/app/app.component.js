@@ -6,19 +6,21 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 var core_1 = require('@angular/core');
+var main_navigation_component_1 = require("./main-navigation/main-navigation.component");
+var router_1 = require("@angular/router");
 var AppComponent = (function () {
     function AppComponent() {
-        this.title = 'app works!';
+        this.title = 'Typeclass Decorator';
     }
     AppComponent = __decorate([
         core_1.Component({
             moduleId: module.id,
             selector: 'app-root',
             templateUrl: 'app.component.html',
-            styleUrls: ['app.component.css']
+            styleUrls: ['app.component.css'],
+            directives: [main_navigation_component_1.MainNavigationComponent, router_1.ROUTER_DIRECTIVES]
         })
     ], AppComponent);
     return AppComponent;
 }());
 exports.AppComponent = AppComponent;
-//# sourceMappingURL=app.component.js.map

@@ -1,8 +1,7 @@
 /**
  * Created by Andreas on 14.07.2016.
  */
-import {Ord, Eq, IOrd, OrdConfig, OrdAnd} from "../decorators/ord.typeclass";
-import {IEq} from "../decorators/eq.typeclass";
+import {Ord, Eq, IOrd, OrdConfig, OrdAnd, IEq} from "decorator-ord";
 import {OrdLocation} from "./ordLocation";
 
 type TColor = "yellow" | "red" | "blue";
@@ -20,39 +19,39 @@ export const carConfig = new OrdConfig();
 })
 export class Car implements IOrd {
     @Ord.field({
-        cardinality: 3
+        ordinality: 3
     })
     private engine:number;
 
     @Ord.field({
-        cardinality: 2,
+        ordinality: 2,
         map: Colors
     })
     private color:TColor;
 
     @Ord.field({
-        cardinality: 4,
+        ordinality: 4,
         map: Brands
     })
     private brand:TBrand;
 
     @Ord.field({
-        cardinality: 1
+        ordinality: 1
     })
     private date:Date;
 
     @Ord.field({
-        cardinality: 5
+        ordinality: 5
     })
     private location:OrdLocation;
 
-    @Eq.field({fuzzy:true})
+    @Eq.field({fuzzy: true})
     private name:string;
 
     @Eq.field({})
     private interior:TInterior;
 
-    constructor(engine?:number, color?:TColor, brand?:TBrand, interior?:TInterior, timestamp?:number, location?:OrdLocation,name?:string) {
+    constructor(engine?:number, color?:TColor, brand?:TBrand, interior?:TInterior, timestamp?:number, location?:OrdLocation, name?:string) {
         this.engine = engine;
         this.color = color;
         this.brand = brand;

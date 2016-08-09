@@ -1,8 +1,7 @@
 import {Component, Input, EventEmitter, Output, OnInit} from '@angular/core';
-import {Field, CountRecord} from "../../decorators/ord.typeclass";
-import {IReCount, FilterProperties, TFilterPropertyKeys, ICounterField} from "../filter.component";
+import {Field, CountRecord,IField} from "decorator-ord";
+import {IReCount, FilterProperties, ICounterField} from "../filter.component";
 import {History} from "../../class/history";
-import {IField} from "../../decorators/eq.typeclass";
 import * as _ from 'lodash';
 import {AsyncPipe} from "@angular/common";
 import {BehaviorSubject} from "rxjs/Rx";

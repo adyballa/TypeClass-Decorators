@@ -1,6 +1,6 @@
 import {Component, OnInit, OnDestroy, ViewChild} from '@angular/core';
 import {ListModelService} from './listModel.service';
-import {Ord, IOrd, IOrdConfig} from '../decorators/ord.typeclass';
+import {Ord, IOrd, IOrdConfig} from "decorator-ord";
 import {FilterComponent} from "../filter/filter.component";
 import {Car} from "../class/car";
 import {SortComponent} from "../filter/sort/sort.component";
