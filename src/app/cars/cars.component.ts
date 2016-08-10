@@ -21,8 +21,6 @@ import {Subscription} from "rxjs/Rx";
  */
 export class CarsComponent implements OnInit, OnDestroy {
 
-    public model:IOrd;
-
     private _result:Car[];
 
     private _config:IOrdConfig;
@@ -35,7 +33,6 @@ export class CarsComponent implements OnInit, OnDestroy {
     private _filterComponent: FilterComponent;
 
     constructor(private listService:ListModelService, private route : ActivatedRoute) {
-        this.model = this.listService.getModel();
         this._config = this.listService.getConfig();
     }
 

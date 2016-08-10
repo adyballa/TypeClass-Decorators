@@ -9,7 +9,7 @@
 const map: any = {
   'lodash': 'vendor/lodash/lodash.js',
   'decorator-ord': 'vendor/decorator-ord/dist',
-  'decorator-eq': 'vendor/decorator-ord/dist/node_modules/decorator-eq',
+  'decorator-eq': 'vendor/decorator-ord/dist/node_modules/decorator-eq'
 };
 
 /** User packages configuration. */

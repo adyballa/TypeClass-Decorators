@@ -5,7 +5,7 @@ import {Car, CarAnd, Colors, Brands, Interiors, carConfig} from '../class/car';
 import {OrdLocation} from "../class/ordLocation";
 
 @Injectable()
-export class ListModelService extends AbstractListModelService {
+export class ListModelService extends AbstractListModelService<Car,CarAnd> {
 
     protected _config:IOrdConfig = carConfig;
 
@@ -21,22 +21,16 @@ export class ListModelService extends AbstractListModelService {
         return this._countRecord;
     }
 
-    public createItem(props:any = {}):IOrd {
-        let {engine = null, color = null, brand = null, interior = null, date = null, location = null, name = null} = props;
-        return this.createItemByParams(Car, [engine, color, brand, interior, date, location, name]);
+    public constructor(){
+        super(Car, CarAnd);
+        console.log("config", this._config);
     }
 
-    public createItems(props:any = {}):IOrd[] {
-        let {engine = null, color = null, brand = null, interior = null, date = null, location = null, name = null} = props, res = [];
-        this.formatProps([engine, color, brand, interior, date, location, name]).forEach((propsRow:Array<any>) => {
-            res.push(this.createItemByParams(Car, propsRow));
-        });
-        return res;
-    }
-
-    public createAndItem(props:any = {}):IOrd {
-        let {engine = null, color = null, brand = null, interior = null, date = null, location = null, name = null} = props;
-        return this.createItemByParams(CarAnd, [engine, color, brand, interior, date, location, name]);
+    private randomString(len:number = 5, possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789") {
+        let text = '';
+        for (let i = 0; i < len; i++)
+            text += possible.charAt(Math.floor(Math.random() * possible.length));
+        return text;
     }
 
     public getOptions(name:string):Array<string> {
@@ -51,14 +45,12 @@ export class ListModelService extends AbstractListModelService {
     }
 
     public getModel():IOrd {
-        return this.createItemByParams(Car, [12, "red", "bmw", "leder", Date.now(), new OrdLocation(100, 100, 100), "model"]);
+        return this.createItemByParams([12, "red", "bmw", "leder", Date.now(), new OrdLocation(100, 100, 100), "model"]);
     }
 
-    private randomString(len:number = 5, possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789") {
-        let text = '';
-        for (let i = 0; i < len; i++)
-            text += possible.charAt(Math.floor(Math.random() * possible.length));
-        return text;
+    protected getParams(props:any = {}):Array<any>{
+        let {engine = null, color = null, brand = null, interior = null, date = null, location = null, name = null} = props;
+        return [engine, color, brand, interior, date, location, name];
     }
 
     protected getList(limit?:number):Promise<IOrd[]> {
