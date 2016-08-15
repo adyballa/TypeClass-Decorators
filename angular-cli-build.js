@@ -18,7 +18,7 @@ module.exports = function(defaults) {
       '@angular/**/*.+(js|js.map)',
       'lodash/*.+(js|js.map)',
       'decorator-ord/dist/*.+(js|js.map)',
-      'decorator-ord/dist/node_modules/**/*.+(js|js.map)'
+      'decorator-ord/node_modules/**/dist/*.+(js|js.map)'
     ]
   });
 };

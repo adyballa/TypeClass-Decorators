@@ -1,12 +1,12 @@
-import {OrdConfig, IOrdConfig, IOrd, EqField} from "decorator-ord";
+import {OrdConfig, IOrdConfig, IOrd, EqField, IEqConfig, IField, isFieldOrd, IOrdField} from "decorator-ord";
 
 export abstract class AbstractListModelService<ITEM extends IOrd, ITEM_AND extends IOrd> {
 
     protected _list:IOrd[] = [];
     public result:IOrd[] = [];
     protected _config:IOrdConfig = new OrdConfig();
-//ctor:{ new(...args:any[]):ITEM
-    constructor(private item:{ new(...args:any[]):ITEM} , private itemAnd:{ new(...args:any[]):ITEM_AND}) {
+
+    constructor(private item:{ new(...args:any[]):ITEM}, private itemAnd:{ new(...args:any[]):ITEM_AND}) {
         this.result = this.list;
         this.getList().then((list:IOrd[]) => {
             this._list = list.slice(0);
@@ -14,9 +14,9 @@ export abstract class AbstractListModelService<ITEM extends IOrd, ITEM_AND exten
         });
     }
 
-    public abstract getOptions(name:string):Array<string>;
-
-    public abstract getModel():IOrd;
+    public getModel():IOrd {
+        return new this.item();
+    }
 
     public getConfig():IOrdConfig {
         return this._config;
@@ -30,64 +30,80 @@ export abstract class AbstractListModelService<ITEM extends IOrd, ITEM_AND exten
         return this._list;
     }
 
-    protected abstract getParams(props:any):Array<any>;
+    public getOptions(name:string):Array<string> {
+        for(let field of (<IEqConfig>this._config).fields) {
+            if (field.name === name && (isFieldOrd(field) && (<IOrdField> field).map.length)) {
+                return field.map;
+            }
+        }
+    }
 
-    protected createItemByParams(params:any[]):IOrd {
-        return new this.item(...params);
+    private implParams(params:any, obj:IOrd):IOrd{
+        (<IEqConfig> this._config).fields.forEach((field:IField) => {
+            if(Object.keys(params).indexOf(field.name)>-1){
+                obj[field.name] = params[field.name];
+            }else{
+                obj[field.name] = null;
+            }
+        });
+        return obj;
+    }
+
+    protected createItemByParams(params:any):IOrd {
+        return this.implParams(params, new this.item());
     }
 
     protected createItemAndByParams(params:any[]):IOrd {
-        return new this.itemAnd(...params);
+        return this.implParams(params, new this.itemAnd());
     }
 
     public createItem(props:any = {}):IOrd {
-        return this.createItemByParams(this.getParams(props));
+        return this.createItemByParams(props);
     }
 
     public createItems(props:any = {}):IOrd[] {
         let res = [];
-        this.formatProps(this.getParams(props)).forEach((propsRow:Array<any>) => {
-            res.push(this.createItemByParams(propsRow));
+        this.formatPropsObject(props).forEach((props:any) => {
+            res.push(this.createItemByParams(props));
         });
         return res;
     }
 
     public createAndItem(props:any = {}):IOrd {
-        return this.createItemAndByParams(this.getParams(props));
+        return this.createItemAndByParams(props);
     }
 
     /**
-     * Erstelle Array mit Reihen fester Länge von passenden Eigenschaften aus
-     * Array mit Reihen gleichen Eigenschaften.
-     * 1.) Spiegelung von x auf y
-     * 2.) Bilde das Kreuzprodukt aus allen Eigenschaften
-     * 3.) Fülle mit null-werten auf.
+     * Erstellt aus einem Objekt aus Array-Werten Objekte aus allen Kombinationen.
      *
      * bsp.:
-     * input: [null, ['red','yellow'],['bmw','honda']]
-     * output: [[null, 'red', 'bmw'], [null, 'red','honda'],[null,'yellow','bmw'],[null,'yellow','honda']]
+     * input: {engine:null,color:['red','yellow'],brand:['bmw','honda']}
+     * output: [{engine:null, color:'red', brand:'bmw'}, {engine:null, color:'red',brand:'honda'],
+     * {engine:null,color:'yellow',brand:'bmw'},{engine:null,color:'yellow',brand:'honda'}]
      *
-     * @param props
-     * @returns {Array}
+     * @param {any} props
+     * @returns {any}
      */
-    protected formatProps(props:Array<any>):Array<Array<string|number>> {
-        let l = 1, res = [], perRow = 0;
-        props.forEach((prop) => l = l * ((Array.isArray(prop)) ? prop.length : 1));
-        perRow = l;
-        for (let i = 0; i < l; i++) {
-            res.push(new Array(props.length).fill(null, 0, props.length));
-        }
-        props.forEach((prop, x) => {
-            let _prop = (Array.isArray(prop)) ? prop : [prop];
-            perRow /= _prop.length;
-            for (let a = 0; a < (l / (_prop.length * perRow)); a++) {
-                _prop.forEach((val, y) => {
-                    for (let i = 0; i < perRow; i++) {
-                        res[a * perRow + i + y][x] = val;
+    protected formatPropsObject(props:any):Array<any> {
+        let res = [{}];
+        for(let field of (<IEqConfig> this._config).fields){
+            if(field.name in props){
+                if (Array.isArray(props[field.name])) {
+                    for (let i = 0; i < res.length * props[field.name].length; i++) {
+                        res[i] = res[i % res.length];
+                        res[i][field.name] = props[field.name][i % props[field.name].length];
                     }
+                } else {
+                    res.forEach((resProps) => {
+                        resProps[field.name] = props[field.name];
+                    });
+                }
+            }else{
+                res.forEach((resProps) => {
+                    resProps[field.name] = null;
                 });
             }
-        });
+        }
         return res;
     }
 

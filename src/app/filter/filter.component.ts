@@ -111,6 +111,7 @@ export class FilterComponent implements AfterViewChecked {
     }
 
     public reBorder(event:IReBorder) {
+        console.log("reBorder", event);
         event.borderRecord.recordOrdConfig(this._filter(this.listService.list, event.props), this._config);
     }
 
@@ -119,6 +120,7 @@ export class FilterComponent implements AfterViewChecked {
             bottom = this.listService.createAndItem(props.bottom),
             eqs = this.listService.createItems(props.eq)
             ;
+        console.log("props ist ", props);
         if (Object.keys(props.eq).length > 0) {
             cs = <IOrd[]>EqOr.fuzzyEq(cs, eqs, this._config);
         }
@@ -139,6 +141,9 @@ export class FilterComponent implements AfterViewChecked {
     public createField(field:EqField):string {
         if (isFieldOrd(field) && field.map.length > 0) {
             return "select";
+        }
+        if(this._model[field.name] === null){
+            return "null";
         }
         if (this._model[field.name] instanceof Date) {
             return (isFieldOrd(field)) ? "date-range" : "date";

@@ -3,6 +3,7 @@
  */
 import {Ord, Eq, IOrd, OrdConfig, OrdAnd, IEq} from "decorator-ord";
 import {OrdLocation} from "./ordLocation";
+import {isDate} from "@angular/core/src/facade/lang";
 
 type TColor = "yellow" | "red" | "blue";
 type TBrand = "bmw" | "pontiac" | "honda";
@@ -21,45 +22,48 @@ export class Car implements IOrd {
     @Ord.field({
         ordinality: 3
     })
-    private engine:number;
+    public engine:number = 0;
 
     @Ord.field({
         ordinality: 2,
         map: Colors
     })
-    private color:TColor;
+    public color:TColor = Colors[0];
 
     @Ord.field({
         ordinality: 4,
         map: Brands
     })
-    private brand:TBrand;
+    public brand:TBrand = Brands[0];
 
-    @Ord.field({
-        ordinality: 1
-    })
-    private date:Date;
+    private _date:Date;
 
     @Ord.field({
         ordinality: 5
     })
-    private location:OrdLocation;
+    public location:OrdLocation = new OrdLocation(10,10,10);
 
     @Eq.field({fuzzy: true})
-    private name:string;
+    public name:string = "";
 
     @Eq.field({})
-    private interior:TInterior;
+    public interior:TInterior = Interiors[0];
 
-    constructor(engine?:number, color?:TColor, brand?:TBrand, interior?:TInterior, timestamp?:number, location?:OrdLocation, name?:string) {
-        this.engine = engine;
-        this.color = color;
-        this.brand = brand;
-        this.interior = interior;
-        this.date = (timestamp === null) ? null : new Date(timestamp);
-        this.location = location;
-        this.name = name;
-    };
+    @Ord.field({
+        ordinality: 1
+    })
+    public set date(timestamp:number|Date){
+        this._date = (timestamp === null) ? null :
+            ((timestamp instanceof Date) ? timestamp : new Date(timestamp));
+    }
+
+    public get date():number|Date{
+        return this._date;
+    }
+
+    constructor(){
+        this.date = new Date();
+    }
 
     greater:(a:IOrd)=>boolean;
     less:(a:IOrd)=>boolean;

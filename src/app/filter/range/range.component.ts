@@ -56,6 +56,7 @@ export class RangeComponent implements IBorderField{
                 reBorder.props['bottom'][this.field.name] = null;
                 //this Eventemitter is synchron
                 this.borderChange.emit(reBorder);
+                console.log("borderRecorder", reBorder.borderRecord);
                 this._border.min.next(reBorder.borderRecord.play(this.field.name, "eq", "min"));
                 this._border.max.next(reBorder.borderRecord.play(this.field.name, "eq", "max"));
                 if(fInit){

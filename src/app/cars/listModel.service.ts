@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {IOrd, IOrdConfig, CountRecord, BorderRecord} from "decorator-ord";
+import {IOrd, IOrdConfig, CountRecord, BorderRecord, IOrdField, IField} from "decorator-ord";
 import {AbstractListModelService} from "./abstractListModel.service";
 import {Car, CarAnd, Colors, Brands, Interiors, carConfig} from '../class/car';
 import {OrdLocation} from "../class/ordLocation";
@@ -21,9 +21,8 @@ export class ListModelService extends AbstractListModelService<Car,CarAnd> {
         return this._countRecord;
     }
 
-    public constructor(){
+    public constructor() {
         super(Car, CarAnd);
-        console.log("config", this._config);
     }
 
     private randomString(len:number = 5, possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789") {
@@ -34,38 +33,29 @@ export class ListModelService extends AbstractListModelService<Car,CarAnd> {
     }
 
     public getOptions(name:string):Array<string> {
-        switch (name) {
-            case "brand" :
-                return Brands;
-            case "interior" :
-                return Interiors;
-            case "color" :
-                return Colors;
+        switch (name){
+            case 'interior' : return Interiors;
+            default : return super.getOptions(name)
         }
     }
 
-    public getModel():IOrd {
-        return this.createItemByParams([12, "red", "bmw", "leder", Date.now(), new OrdLocation(100, 100, 100), "model"]);
-    }
-
-    protected getParams(props:any = {}):Array<any>{
-        let {engine = null, color = null, brand = null, interior = null, date = null, location = null, name = null} = props;
-        return [engine, color, brand, interior, date, location, name];
+    private createRandomParams(cardinality:number):{[name:string]:any} {
+        return {
+            engine: Math.ceil(Math.random() * (cardinality)),
+            color: Colors[Math.floor(Math.random() * Colors.length)],
+            brand: Brands[Math.floor(Math.random() * Brands.length)],
+            interior: Interiors[Math.floor(Math.random() * Interiors.length)],
+            date: Date.now() - Math.random() * 1000000000000,
+            location: new OrdLocation(Math.random() * 100, Math.random() * 100, Math.random() * 1000),
+            name: this.randomString()
+        }
     }
 
     protected getList(limit?:number):Promise<IOrd[]> {
         let cars = new Array((limit === null) ? 3500 : limit);
 
         for (let i = 0; i < cars.length; i++) {
-            cars[i] = {
-                engine: Math.ceil(Math.random() * (i + 1) * 5),
-                color: Colors[Math.floor(Math.random() * Colors.length)],
-                brand: Brands[Math.floor(Math.random() * Brands.length)],
-                interior: Interiors[Math.floor(Math.random() * Interiors.length)],
-                date: Date.now() - Math.random() * 1000000000000,
-                location: new OrdLocation(Math.random() * 100, Math.random() * 100, Math.random() * 1000),
-                name: this.randomString()
-            };
+            cars[i] = this.createRandomParams(i + 1);
         }
         return Promise.resolve(cars.map((props) => this.createItem(props)));
     }

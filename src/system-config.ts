@@ -9,16 +9,16 @@
 const map: any = {
   'lodash': 'vendor/lodash/lodash.js',
   'decorator-ord': 'vendor/decorator-ord/dist',
-  'decorator-eq': 'vendor/decorator-ord/dist/node_modules/decorator-eq'
+  'decorator-eq': 'vendor/decorator-ord/node_modules/decorator-eq/dist'
 };
 
 /** User packages configuration. */
 const packages: any = {
-  './vendor/decorator-ord/dist/node_modules/decorator-eq':{
+  './vendor/decorator-ord/node_modules/decorator-eq/dist':{
     main: 'index.js',
     defaultExtension: 'js',
     map:{
-      'decorator-eq': 'vendor/decorator-ord/dist/node_modules/decorator-eq'
+      'decorator-eq': 'vendor/decorator-ord/node_modules/decorator-eq/dist'
     }
   },
   './vendor/decorator-ord/dist':{
