@@ -78,7 +78,6 @@ export class FilterComponent implements AfterViewChecked {
 
     constructor(private listService:ListModelService) {
         this.fields = this.listService.fields;
-        this._model = this.listService.getModel();
         this._config = <IOrdConfig> this.listService.getConfig().clone();
         this._history = new History<IField>(2);
     }
@@ -120,7 +119,6 @@ export class FilterComponent implements AfterViewChecked {
             bottom = this.listService.createAndItem(props.bottom),
             eqs = this.listService.createItems(props.eq)
             ;
-        console.log("props ist ", props);
         if (Object.keys(props.eq).length > 0) {
             cs = <IOrd[]>EqOr.fuzzyEq(cs, eqs, this._config);
         }

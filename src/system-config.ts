@@ -9,7 +9,8 @@
 const map: any = {
   'lodash': 'vendor/lodash/lodash.js',
   'decorator-ord': 'vendor/decorator-ord/dist',
-  'decorator-eq': 'vendor/decorator-ord/node_modules/decorator-eq/dist'
+  'decorator-eq': 'vendor/decorator-ord/node_modules/decorator-eq/dist',
+  'ng2-filter-ords': 'vendor/ng2-filter-ords/lib/src/model/abstractListModel.service.js'
 };
 
 /** User packages configuration. */

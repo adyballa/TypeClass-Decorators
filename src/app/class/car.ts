@@ -61,6 +61,11 @@ export class Car implements IOrd {
         return this._date;
     }
 
+    @Ord.field({
+        ordinality: 6
+    })
+    public tueren:number = 0;
+
     constructor(){
         this.date = new Date();
     }

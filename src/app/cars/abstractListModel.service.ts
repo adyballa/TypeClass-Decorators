@@ -1,20 +1,34 @@
-import {OrdConfig, IOrdConfig, IOrd, EqField, IEqConfig, IField, isFieldOrd, IOrdField} from "decorator-ord";
+import {OrdConfig, IOrdConfig, IOrd, EqField, IEqConfig, IField, isFieldOrd, IOrdField, CountRecord, BorderRecord} from "decorator-ord";
 
 export abstract class AbstractListModelService<ITEM extends IOrd, ITEM_AND extends IOrd> {
 
-    protected _list:IOrd[] = [];
-    public result:IOrd[] = [];
+    protected _list:ITEM[] = [];
+    private _result:ITEM[] = [];
     protected _config:IOrdConfig = new OrdConfig();
+    private _countRecord:CountRecord = new CountRecord();
+    private _borderRecord:BorderRecord = new BorderRecord();
+
+    public get borderRecord() {
+        return this._borderRecord;
+    }
+
+    public get countRecord() {
+        return this._countRecord;
+    }
+
+    set result(value:IOrd[]) {
+        this._result = <ITEM[]> value;
+    }
 
     constructor(private item:{ new(...args:any[]):ITEM}, private itemAnd:{ new(...args:any[]):ITEM_AND}) {
-        this.result = this.list;
-        this.getList().then((list:IOrd[]) => {
+        this._result = this.list;
+        this.getList().then((list) => {
             this._list = list.slice(0);
-            this.result = list;
+            this._result = list;
         });
     }
 
-    public getModel():IOrd {
+    public getModel():ITEM {
         return new this.item();
     }
 
@@ -26,14 +40,14 @@ export abstract class AbstractListModelService<ITEM extends IOrd, ITEM_AND exten
         return this._config.fields;
     }
 
-    get list():IOrd[] {
+    get list():ITEM[] {
         return this._list;
     }
 
     public getOptions(name:string):Array<string> {
         for(let field of (<IEqConfig>this._config).fields) {
             if (field.name === name && (isFieldOrd(field) && (<IOrdField> field).map.length)) {
-                return field.map;
+                return (<IOrdField> field).map;
             }
         }
     }
@@ -49,19 +63,19 @@ export abstract class AbstractListModelService<ITEM extends IOrd, ITEM_AND exten
         return obj;
     }
 
-    protected createItemByParams(params:any):IOrd {
-        return this.implParams(params, new this.item());
+    protected createItemByParams(params:any):ITEM {
+        return <ITEM> this.implParams(params, new this.item());
     }
 
-    protected createItemAndByParams(params:any[]):IOrd {
-        return this.implParams(params, new this.itemAnd());
+    protected createItemAndByParams(params:any[]):ITEM_AND {
+        return <ITEM_AND> this.implParams(params, new this.itemAnd());
     }
 
-    public createItem(props:any = {}):IOrd {
+    public createItem(props:any = {}):ITEM {
         return this.createItemByParams(props);
     }
 
-    public createItems(props:any = {}):IOrd[] {
+    public createItems(props:any = {}):ITEM[] {
         let res = [];
         this.formatPropsObject(props).forEach((props:any) => {
             res.push(this.createItemByParams(props));
@@ -69,7 +83,7 @@ export abstract class AbstractListModelService<ITEM extends IOrd, ITEM_AND exten
         return res;
     }
 
-    public createAndItem(props:any = {}):IOrd {
+    public createAndItem(props:any = {}):ITEM_AND {
         return this.createItemAndByParams(props);
     }
 
@@ -108,11 +122,11 @@ export abstract class AbstractListModelService<ITEM extends IOrd, ITEM_AND exten
     }
 
     public setList(limit?:number):Promise<void> {
-        return this.getList(limit).then((list:IOrd[]) => {
+        return this.getList(limit).then((list:ITEM[]) => {
             this._list = list.slice(0);
-            this.result = list;
+            this._result = list;
         });
     }
 
-    protected abstract getList(limit?:number):Promise<IOrd[]>;
+    protected abstract getList(limit?:number):Promise<ITEM[]>;
 }
